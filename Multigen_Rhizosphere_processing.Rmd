@@ -1,0 +1,264 @@
+---
+title: "Multigen_Rhizosphere"
+author: "Abby Sulesky"
+date: "2023-02-01"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Input files
+
+#### Multiplexed files copied from raw_sequence into:
+/mnt/research/ShadeLab/WorkingSpace/Sulesky/Multigen_seed_analysis/input_data and /figaro
+
+(base) -bash-4.2$ cd /mnt/research/ShadeLab/Sequence/raw_sequence/Bean_heritability/20230130_seed16S
+(base) -bash-4.2$ ls
+230126_Shade_Seeds_16s_DG_230126.txt  Undetermined_S0_L001_R1_001.fastq
+Undetermined_S0_L001_I1_001.fastq     Undetermined_S0_L001_R2_001.fastq
+
+(base) -bash-4.2$ cp Undetermined_S0_L001_R1_001.fastq Undetermined_S0_L001_R2_001.fastq /mnt/research/ShadeLab/WorkingSpace/Sulesky/Multigen_seed_analysis/figaro
+
+(base) -bash-4.2$ cp Undetermined_S0_L001_I1_001.fastq Undetermined_S0_L001_R1_001.fastq Undetermined_S0_L001_R2_001.fastq 230126_Shade_Seeds_16s_DG_230126.txt /mnt/research/ShadeLab/WorkingSpace/Sulesky/Multigen_seed_analysis/input_data
+
+#### rename files for figaro:
+(base) -bash-4.2$ cd /mnt/research/ShadeLab/WorkingSpace/Sulesky/Multigen_seed_analysis
+(base) -bash-4.2$ ls
+figaro  input_data
+(base) -bash-4.2$ cd figaro/
+(base) -bash-4.2$ ls
+Undetermined_S0_L001_R1_001.fastq  Undetermined_S0_L001_R2_001.fastq
+(base) -bash-4.2$ mv Undetermined_S0_L001_R1_001.fastq seed_16s_R1.fastq
+(base) -bash-4.2$ mv Undetermined_S0_L001_R2_001.fastq seed_16s_R2.fastq
+(base) -bash-4.2$ ls
+seed_16s_R1.fastq  seed_16s_R2.fastq
+
+#### Rename files in input data
+(base) -bash-4.2$ mv Undetermined_S0_L001_I1_001.fastq barcodes.fastq
+(base) -bash-4.2$ mv Undetermined_S0_L001_R1_001.fastq forward.fastq
+(base) -bash-4.2$ mv Undetermined_S0_L001_R2_001.fastq reverse.fastq
+
+#### Compress files into zip format for qiime2 artifact (takes ~10 minutes)
+gzip *.fastq
+
+#### Check
+ ls
+barcodes.fastq.gz  forward.fastq.gz  reverse.fastq.gz
+
+#### Create qiime2 artifact and demultiplex with EMP paired end protocol
+cd /mnt/research/ShadeLab/WorkingSpace/Sulesky/Multigen_seed_analysis
+
+nano seed_demultiplex.sb
+
+```{bash}
+#!/bin/bash -login
+
+#SBATCH --time=03:59:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=64G
+#SBATCH --job-name seed_demultiplex
+#SBATCH --mail-user=suleskya@msu.edu
+#SBATCH --mail-type=BEGIN,END
+
+######## Job code
+
+conda activate qiime2-2022.8
+
+qiime tools import \
+	--type EMPPairedEndSequences \
+	--input-path /mnt/research/ShadeLab/WorkingSpace/Sulesky/Multigen_seed_analysis/input_data \
+	--output-path /mnt/research/ShadeLab/WorkingSpace/Sulesky/Multigen_seed_analysis/input_data.qza
+	
+qiime demux emp-paired \
+        --m-barcodes-file 230126_Shade_Seeds_16s_DG_230126.txt \
+        --m-barcodes-column BarcodeSequence \
+        --p-no-golay-error-correction \
+        --i-seqs input_data.qza \
+        --o-per-sample-sequences demultiplexed-seqs.qza \
+        --o-error-correction-details demux-details.qza
+
+qiime demux summarize --i-data demultiplexed-seqs.qza --o-visualization demux-vis.qzv
+
+conda deactivate
+
+echo -e "\n `sacct -u suleskya -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_ID
+
+```
+
+submit job from Multigen_seed_analysis directory:
+sbatch seed_demultiplex.sb
+
+## Figaro
+use unzipped non-demultiplexed files for figaro, copied them from input_data folder
+
+(figaro) -bash-4.2$ cp rhizo_16s_R1.fastq /mnt/research/ShadeLab/WorkingSpace/Sulesky/Multigen_Rhizosphere_analysis/figaro
+(figaro) -bash-4.2$ cp rhizo_16s_R2.fastq /mnt/research/ShadeLab/WorkingSpace/Sulesky/Multigen_Rhizosphere_analysis/figaro
+
+must be named *_16s_R1.fastq and _16s_R2.fastq and be only fastq files in folder
+
+go back to home driectory and figaro install folder to run
+(figaro) -bash-4.2$ cd /mnt/home/suleskya/figaro-master/figaro
+
+run figaro (takes 5-10 minutes, don't need a job):
+(figaro) -bash-4.2$ conda activate figaro
+(figaro) -bash-4.2$ python figaro.py -i /mnt/research/ShadeLab/WorkingSpace/Sulesky/Multigen_Rhizosphere_analysis/figaro -o /mnt/research/ShadeLab/WorkingSpace/Sulesky/Multigen_Rhizosphere_analysis/figaro -f 1 -r 1 -a 253 -F zymo
+
+go check outputs
+(figaro) -bash-4.2$ cd /mnt/research/ShadeLab/WorkingSpace/Sulesky/Multigen_Rhizosphere_analysis/figaro
+(figaro) -bash-4.2$ ls
+figaro.167521793883194.log  reverseExpectedError.png  rhizo_16s_R2.fastq
+forwardExpectedError.png    rhizo_16s_R1.fastq        trimParameters.json
+
+look at results for trim parameters
+(figaro) -bash-4.2$ less trimParameters.json
+
+  {
+        "trimPosition": [
+            103,
+            172
+        ],
+        "maxExpectedError": [
+            1,
+            2
+        ],
+        "readRetentionPercent": 93.38,
+        "score": 92.3836052348512
+    },
+
+will use these trim parameters for DADA2: forward trim 103, reverse trim 172, will merge 93.39% of reads
+
+# Run DADA2 on qiime2 to denoise, filter chimeras and merge reads to ASVs
+
+view dada2 denoise-paired defaults at https://docs.qiime2.org/2022.8/plugins/available/dada2/denoise-paired/
+
+will run this as a job
+
+job script: dada2_merge.sb
+
+temporarily saved outputs in /mnt/gs21/scratch/groups/ShadeLab/Abby_scratch/rhizo_multigen
+```{r}
+#!/bin/bash -login
+########## SBATCH Lines for Resource Request ##########
+
+#SBATCH --time=48:00:00      
+#SBATCH --nodes=1   
+#SBATCH --ntasks=1     
+#SBATCH --cpus-per-task=32       
+#SBATCH --mem=64G            
+#SBATCH --job-name dada2_rhizo
+#SBATCH -A shade-cole-bonito 
+#SBATCH --mail-user=suleskya@msu.edu
+#SBATCH --mail-type=BEGIN,END
+########## Command Lines for Job Running ##########
+
+conda activate qiime2-2022.8
+
+qiime dada2 denoise-paired \
+        --i-demultiplexed-seqs demultiplexed-seqs.qza \
+        --p-trunc-len-f 103 \
+        --p-trunc-len-r 172 \
+        --o-table table.qza \
+        --o-representative-sequences rep-seqs.qza \
+        --o-denoising-stats denoising-stats.qza
+
+conda deactivate
+
+echo -e "\n `sacct -u suleskya -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_I
+
+```
+
+submit job:
+sbatch dada2_merge.sb
+
+check queue:
+sq
+
+job took 5.5 hours
+
+/mnt/gs21/scratch/groups/ShadeLab/Abby_scratch/rhizo_multigen
+
+visualize the output using the codes below
+qiime metadata tabulate \
+  --m-input-file denoising-stats.qza \
+  --o-visualization denoising-stats.qzv
+
+qiime feature-table summarize \
+  --i-table table.qza \
+  --o-visualization table.qzv \
+  --m-sample-metadata-file 220914_Shade_16s_DG_220826.txt
+
+qiime feature-table tabulate-seqs \
+  --i-data rep-seqs.qza \
+  --o-visualization rep-seqs.qzv
+
+# Assign taxonomy using Silva
+
+Download reference seqs from qiime2.org:
+wget https://data.qiime2.org/2022.8/common/silva-138-99-515-806-nb-classifier.qza
+
+job:
+nano classify-silva-taxonomy.sb
+```{bash}
+#!/bin/bash -login
+########## SBATCH Lines for Resource Request ##########
+
+#SBATCH --time=08:00:00            
+#SBATCH --nodes=1                
+#SBATCH --ntasks=1                 
+#SBATCH --cpus-per-task=32          
+#SBATCH --mem=64G          
+#SBATCH --job-name taxonomy	 
+#SBATCH -A shade-cole-bonito 
+#SBATCH --mail-user=suleskya@msu.edu
+#SBATCH --mail-type=BEGIN,END
+
+########## Command Lines for Job Running ##########
+
+conda activate qiime2-2022.8
+
+qiime feature-classifier classify-sklearn \
+  --i-classifier silva-138-99-515-806-nb-classifier.qza \
+  --i-reads rep-seqs.qza \
+  --o-classification taxonomy.qza
+
+qiime metadata tabulate \
+  --m-input-file taxonomy.qza \
+  --o-visualization taxonomy.qzv
+
+qiime tools export \
+  --input-path taxonomy.qza \
+  --output-path phyloseq
+
+conda deactivate
+
+echo -e "\n `sacct -u suleskya -j $SLURM_JOB_ID --format=JobID,JobName,Start,End,Elapsed,NCPUS,ReqMem` \n"
+scontrol show job $SLURM_JOB_I
+
+
+
+```
+
+Export OTU table to new directory phyloseq
+qiime tools export \
+  --input-path table.qza \
+  --output-path phyloseq
+
+OTU tables exports as feature-table.biom so convert to .tsv
+biom convert \
+  -i phyloseq/feature-table.biom \
+  -o phyloseq/otu_table.txt \
+  --to-tsv
+
+download otu table, manually change "#OTU ID" column header to "OTUID"
+
+download taxonomy file and  manually change Feature ID to OTUID in taxonomy.tsv. change taxonomy and OTU tables to csv format.
+
+these files are now ready to export to R and run using phyloseq
+

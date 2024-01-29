@@ -1,0 +1,11 @@
+,sample_id,growth_chamber,Generation,Treatment_G1,sample_type,fresh.root.weight_g,roots,fresh.shoot.weight_g,shoots,fresh.pods.weight_g,empty_pods,pod_count,seed_count,dry.seed.weight_g,X30dry.seed.weight_g,total_aboveground,A,gsw,pods
+1,C1,2,G1,Control,destructive,38.71,3.29,42.32,8.19,69.53,6.75,13,43,16.62,11.81,31.56,12.088,0.128,23.37
+2,C3,1,G1,Control,destructive,58.08,6.53,53.54,9.01,66.71,6.28,9,36,15.54,13.14,30.83,15.341,0.176,21.82
+3,C7,1,G1,Control,destructive,35.1,4.18,51.37,9.23,60.78,5.09,7,35,14.9,12.82,29.22,14.653,0.159,19.99
+4,C9,2,G1,Control,destructive,57.15,7.7,68.89,11.66,68.18,7.75,14,40,13.62,10.01,33.03,14.404,0.163,21.37
+5,C14,1,G1,Control,destructive,30.06,3.87,57.67,10.93,54.26,5.54,9,30,11.25,11.25,27.72,13.178,0.124,16.79
+6,D1,1,G1,Drought,destructive,43.37,3.19,39.76,6.72,65.34,5.34,8,38,16.54,13.01,28.6,5.929,0.044,21.88
+7,D2,1,G1,Drought,destructive,39.78,2.93,36.09,5.97,54.16,6.4,11,31,12.55,12.13,24.92,7.865,0.065,18.95
+8,D3,1,G1,Drought,destructive,47.62,3.42,44.99,6.94,70.83,6.44,11,37,14.07,11.5,27.45,13.083,0.156,20.51
+9,D4,2,G1,Drought,destructive,42.53,5.39,45,6.98,63.53,5.42,10,37,13.62,10.97,26.02,9.839,0.089,19.04
+10,D12,2,G1,Drought,destructive,33.63,4.82,43.55,8.12,67.35,6.81,12,42,14.74,10.76,29.67,10.74,0.094,21.55

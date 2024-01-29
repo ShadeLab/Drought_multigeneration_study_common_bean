@@ -1,0 +1,901 @@
+---
+title: "Plant Health"
+author: "Abby Sulesky"
+date: "2023-06-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r , message=FALSE, results='hide', warning=FALSE}
+library(dplyr)
+library(tidyverse)
+library(devtools)
+library(ggpubr)
+library(stats)
+library(stats)
+library(rstatix)
+library(ggsignif)
+library(patchwork)
+```
+
+
+# Gen 1
+
+### Load in G1 data
+```{r, results='hide'}
+#gen1_plant_data <- read.csv("/Users/Abby/OneDrive - Michigan State University/Project/bean.data_G1.csv", header=TRUE)
+#str(gen1_plant_data)
+
+#gen1_plant_data$growth_chamber <- as.factor(gen1_plant_data$growth_chamber)
+#gen1_plant_data$treatment <- as.factor(gen1_plant_data$treatment)
+#str(gen1_plant_data)
+
+# Subset Control and Drought
+#gen1_plant_data <- gen1_plant_data[gen1_plant_data$treatment != "Nutrient",]
+#str(gen1_plant_data)
+
+# save as a new csv with just group 1 C and D and read back in to remove the empty conditions
+#write.csv(gen1_plant_data, file="/Users/Abby/OneDrive - Michigan State University/Project/G1_CD_planthealth.csv")
+gen1_plant_data <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/Project/G1_CD_planthealth.csv")
+str(gen1_plant_data)
+gen1_plant_data$growth_chamber <- as.factor(gen1_plant_data$growth_chamber)
+gen1_plant_data$Treatment_G1 <- as.factor(gen1_plant_data$Treatment_G1)
+str(gen1_plant_data)
+```
+
+
+
+### Analysis
+```{r}
+# Photosynthetic rate 
+#boxplot(gen1_plant_data$A ~ gen1_plant_data$treatment)
+G1_A_trt <- t.test(A ~ Treatment_G1, data=gen1_plant_data)
+G1_A_trt
+# p < 0.05 *
+
+# Stomatal conductance
+#boxplot(gen1_plant_data$gsw ~ gen1_plant_data$treatment)
+G1_gsw_trt <- t.test(gsw ~ Treatment_G1, data=gen1_plant_data)
+G1_gsw_trt
+# p < 0.05 *
+
+# Pod count
+#boxplot(gen1_plant_data$pod_count ~ gen1_plant_data$treatment)
+G1_podcount_trt <- t.test(pod_count ~ Treatment_G1, data=gen1_plant_data)
+G1_podcount_trt
+
+## Seed count
+#boxplot(gen1_plant_data$seed_count ~ gen1_plant_data$treatment)
+G1_seedcount_trt <- t.test(seed_count ~ Treatment_G1, data=gen1_plant_data)
+G1_seedcount_trt
+
+# Shoot dry weight
+#boxplot(gen1_plant_data$shoots ~ gen1_plant_data$treatment)
+#G1_shoots_trt <- t.test(shoots ~ Treatment_G1, data=gen1_plant_data)
+#G1_shoots_trt
+
+# Pod dry weight
+#boxplot(gen1_plant_data$pods ~ gen1_plant_data$treatment)
+#G1_pods_trt <- t.test(pods ~ Treatment_G1, data=gen1_plant_data)
+#G1_pods_trt
+
+# Total above ground dry weight
+#boxplot(gen1_plant_data$total_aboveground ~ gen1_plant_data$treatment)
+G1_above_trt <- t.test(total_aboveground ~ Treatment_G1, data=gen1_plant_data)
+G1_above_trt
+# p < 0.05 *
+
+# Root dry weight
+#boxplot(gen1_plant_data$roots ~ gen1_plant_data$treatment)
+G1_roots_trt <- t.test(roots ~ Treatment_G1, data=gen1_plant_data)
+G1_roots_trt
+```
+
+### Figures
+```{r, warning=FALSE}
+# code for background theme for ggplot so I don't have to have it in every plot
+my_theme <- theme(panel.background = element_rect(fill = "white", colour = "white"), 
+             panel.grid.major = element_line(size = 0.25, linetype = 'solid', colour = "light gray"),
+             panel.grid.minor = element_line(size = 0.25, linetype = 'solid', colour = "light gray"))
+
+# Photosynthetic rate
+A_plot_G1 <- ggplot(data=gen1_plant_data, aes(x=Treatment_G1, y=A)) + 
+  geom_boxplot(aes(color=Treatment_G1)) + 
+  scale_color_manual(name = "Treatment",
+                     values = c("#3399FF","#FFCC00"), 
+                     labels = c("Control", "Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="Treatment", y="Photosynth. Rate (µmol/m²s)", title = "B.1", tag = "B (USA)") + 
+  my_theme +
+  geom_signif(comparisons=list(c("Control", "Drought")), annotations="*",
+              y_position = 15.5, textsize = 6) + ylim(7,17) + theme(legend.position="none", plot.tag = element_text(face="bold"), axis.text.x=element_blank(), axis.title.x=element_blank())
+A_plot_G1
+
+# Stomatal conductance
+gsw_plot_G1 <- ggplot(data=gen1_plant_data, aes(x=Treatment_G1, y=gsw)) + 
+  geom_boxplot(aes(color=Treatment_G1)) +
+  geom_signif(comparisons=list(c("Control", "Drought")), annotations="*",
+              y_position = 0.19, textsize = 6) + 
+  scale_color_manual(name = "Treatment",
+                     values = c("#3399FF","#FFCC00"), 
+                     labels = c("Control", "Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="Treatment", y="Stomatal Conduct. (mol/m²s)", title = "B.2") + 
+  my_theme + ylim(0.04, 0.22)  + theme(legend.position="none", axis.text.x=element_blank(), axis.title.x=element_blank())
+gsw_plot_G1
+
+# Pod Count
+pod_plot_G1 <- ggplot(data=gen1_plant_data, aes(x=Treatment_G1, y=pod_count)) + 
+  geom_boxplot(aes(color=Treatment_G1)) + 
+  scale_color_manual(name = "Treatment",
+                     values = c("#3399FF","#FFCC00"), 
+                     labels = c("Control", "Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="Treatment", y="Pods Per Plant", title = "B.3") + 
+  my_theme + theme(legend.position="none", axis.text.x=element_blank(), axis.title.x=element_blank())
+pod_plot_G1
+
+# Seed Count
+seed_plot_G1 <- ggplot(data=gen1_plant_data, aes(x=Treatment_G1, y=seed_count)) + 
+  geom_boxplot(aes(color=Treatment_G1)) + 
+  scale_color_manual(name = "Treatment",
+                     values = c("#3399FF","#FFCC00"), 
+                     labels = c("Control", "Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="Treatment", y="Seeds Per Plant", title = "B.4") + 
+  my_theme + theme(legend.position="none")
+seed_plot_G1
+
+# Shoot dry weight
+shoot_plot_G1 <- ggplot(data=gen1_plant_data, aes(x=Treatment_G1, y=shoots)) + 
+  geom_boxplot(aes(color=Treatment_G1)) + 
+  scale_color_manual(name = "Treatment",
+                     values = c("#3399FF","#FFCC00"), 
+                     labels = c("Control", "Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="Treatment", y="Weight (g)", title = "Shoot Dry Weight") + 
+  my_theme
+#shoot_plot_G1
+
+# Above_ground dry weight
+above_plot_G1 <- ggplot(data=gen1_plant_data, aes(x=Treatment_G1, y=total_aboveground)) + 
+  geom_boxplot(aes(color=Treatment_G1)) + 
+  scale_color_manual(name = "Treatment",
+                     values = c("#3399FF","#FFCC00"), 
+                     labels = c("Control", "Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="Treatment", y="Above-Ground Mass (g)", title = "B.5") + 
+  my_theme + geom_signif(comparisons=list(c("Control", "Drought")), annotations="*",
+              y_position = 32, textsize = 6) + ylim(27,33) + theme(legend.position="none")
+above_plot_G1
+
+# Root dry weight
+root_plot_G1 <- ggplot(data=gen1_plant_data, aes(x=Treatment_G1, y=roots)) + 
+  geom_boxplot(aes(color=Treatment_G1)) + 
+  scale_color_manual(name = "Treatment",
+                     values = c("#3399FF","#FFCC00"), 
+                     labels = c("Control", "Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="Treatment", y="Root Mass (g)", title = "B.6") + 
+  my_theme + theme(legend.position="none")
+root_plot_G1
+
+MSU_G1_plots <- A_plot_G1 + gsw_plot_G1 + pod_plot_G1 + seed_plot_G1 + above_plot_G1 + root_plot_G1 + plot_layout(ncol=3)
+
+MSU_G1_plots
+```
+
+# Gen 2
+
+### Load in G2 data
+```{r, results='hide'}
+setwd("/Users/Abby/OneDrive - Michigan State University/Project/Gen2/")
+plant_data <- read.csv("G2_Health_FullData.csv")
+#str(plant_data)
+
+# coerce as factors
+plant_data$planting_group <- as.factor(plant_data$planting_group)
+plant_data$growth_chamber <- as.factor(plant_data$growth_chamber)
+plant_data$treatment <- as.factor(plant_data$treatment)
+plant_data$parent_treatment <- as.factor(plant_data$parent_treatment)
+plant_data$combocondition <- as.factor(plant_data$combocondition)
+plant_data$shelf <- as.factor(plant_data$shelf)
+#str(plant_data)
+
+#subset G2 group 1 Control and Drought
+group1 <- plant_data[plant_data$planting_group == "1",]
+#str(group1)
+group1 <- group1[group1$treatment != "Nutrient",]
+group1 <- group1[group1$parent_treatment != "Nutrient",]
+
+group1 <- as_tibble(group1)
+#str(group1)
+
+# tibble/data frame are still keeping nutrient conditions as factors even though nothing in the data has those, so going to save as a new csv with just group 1 C and D and read back in to remove the empty conditions
+#write.csv(group1, file="/Users/Abby/OneDrive - Michigan State University/Project/G2_group1_planthealth.csv")
+
+group1 <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/Project/G2_group1_planthealth.csv")
+
+#str(group1)
+
+group1$planting_group <- as.factor(group1$planting_group)
+group1$growth_chamber <- as.factor(group1$growth_chamber)
+group1$Treatment_G2 <- as.factor(group1$Treatment_G2)
+group1$Treatment_G1 <- as.factor(group1$Treatment_G1)
+group1$Treatment_G1G2 <- as.factor(group1$Treatment_G1G2)
+group1$shelf <- as.factor(group1$shelf)
+#str(group1)
+
+# Subset all G2 control and drought
+plant_data <- plant_data[plant_data$treatment != "Nutrient",]
+plant_data <- plant_data[plant_data$parent_treatment != "Nutrient",]
+#str(plant_data)
+
+# save as a new csv with just C and D and read back in to remove the empty conditions
+#write.csv(plant_data, file="/Users/Abby/OneDrive - Michigan State University/Project/G2_CD_planthealth.csv")
+G2_plant_data <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/Project/G2_CD_planthealth.csv")
+
+G2_plant_data$planting_group <- as.factor(G2_plant_data$planting_group)
+G2_plant_data$growth_chamber <- as.factor(G2_plant_data$growth_chamber)
+G2_plant_data$Treatment_G2 <- as.factor(G2_plant_data$Treatment_G2)
+G2_plant_data$Treatment_G1 <- as.factor(G2_plant_data$Treatment_G1)
+G2_plant_data$Treatment_G1G2 <- as.factor(G2_plant_data$Treatment_G1G2)
+G2_plant_data$shelf <- as.factor(G2_plant_data$shelf)
+#str(G2_plant_data)
+```
+
+### Analysis
+```{r}
+# Photosynthetic rate - Group 1 only due to significant impact of planting group
+#boxplot(group1$A ~ group1$combocondition)
+#boxplot(group1$A ~ group1$treatment)
+
+anova_group1_A <- aov(A ~ Treatment_G1G2, data=group1)
+group1_A_trt <- t.test(A ~ Treatment_G2, data=group1)
+summary(anova_group1_A)
+group1_A_trt
+
+tukey_group1_A <- tukey_hsd(group1, A ~ Treatment_G1G2)
+tukey_group1_A
+
+#trying blocks
+#library(FSA)
+#library(lsmeans)
+#Summarize(A ~ planting_group + Treatment_G1G2,
+#          data=G2_plant_data,
+#          digits=2)
+
+#model = lm(A ~  Treatment_G1G2 + planting_group,
+#           data = G2_plant_data)
+#summary(model)
+#Anova(model,
+#      type = "II")
+
+# Stomatal conductance  - Group 1 only due to significant impact of planting group
+#boxplot(group1$gsw ~ group1$combocondition)
+#boxplot(group1$gsw ~ group1$treatment)
+anova_group1_gsw <- aov(gsw ~ Treatment_G1G2, data=group1)
+group1_gsw_trt <- t.test(gsw ~ Treatment_G2, data=group1)
+summary(anova_group1_gsw)
+group1_gsw_trt
+
+tukey_group1_gsw <- tukey_hsd(group1, gsw ~ Treatment_G1G2)
+tukey_group1_gsw
+
+# Pod count
+#boxplot(G2_plant_data$pod_count ~ G2_plant_data$combocondition)
+#boxplot(G2_plant_data$pod_count ~ G2_plant_data$treatment)
+anova_G2_podcount <- aov(pod_count ~ Treatment_G1G2, data=G2_plant_data)
+G2_podcount_trt <- t.test(pod_count ~ Treatment_G2, data=G2_plant_data)
+summary(anova_G2_podcount)
+G2_podcount_trt
+
+# Seed count
+#boxplot(G2_plant_data$seed_count ~ G2_plant_data$combocondition)
+#boxplot(G2_plant_data$seed_count ~ G2_plant_data$treatment)
+anova_G2_seedcount <- aov(seed_count ~ Treatment_G1G2, data=G2_plant_data)
+G2_seedcount_trt <- t.test(seed_count ~ Treatment_G2, data=G2_plant_data)
+summary(anova_G2_seedcount)
+G2_seedcount_trt
+
+# Shoot dry weight
+#hist(plant_data$shoots)
+#boxplot(G2_plant_data$shoots ~ G2_plant_data$combocondition)
+#boxplot(G2_plant_data$shoots ~ G2_plant_data$treatment)
+anova_G2_shoots <- aov(shoots ~ Treatment_G1G2, data=G2_plant_data)
+G2_shoots_trt <- t.test(shoots ~ Treatment_G2, data=G2_plant_data)
+summary(anova_G2_shoots)
+G2_shoots_trt
+
+# Pod dry weight
+#hist(G2_plant_data$pods)
+#boxplot(G2_plant_data$pods ~ G2_plant_data$combocondition)
+#boxplot(G2_plant_data$pods ~ G2_plant_data$treatment)
+anova_G2_pods <- aov(pods ~ Treatment_G1G2, data=G2_plant_data)
+G2_pods_trt <- t.test(pods ~ Treatment_G2, data=G2_plant_data)
+summary(anova_G2_pods)
+G2_pods_trt
+
+# Total above ground dry weight
+#hist(G2_plant_data$total_aboveground)
+#boxplot(G2_plant_data$total_aboveground ~ G2_plant_data$combocondition)
+#boxplot(G2_plant_data$total_aboveground ~ G2_plant_data$treatment)
+anova_G2_above <- aov(total_aboveground ~ Treatment_G1G2, data=G2_plant_data)
+G2_above_trt <- t.test(total_aboveground ~ Treatment_G2, data=G2_plant_data)
+summary(anova_G2_above)
+G2_above_trt
+
+# Root dry weight
+#hist(G2_plant_data$roots)
+#boxplot(G2_plant_data$roots ~ G2_plant_data$combocondition)
+#boxplot(G2_plant_data$roots ~ G2_plant_data$treatment)
+anova_G2_roots <- aov(roots ~ Treatment_G1G2, data=G2_plant_data)
+G2_roots_trt <- t.test(roots ~ Treatment_G2, data=G2_plant_data)
+summary(anova_G2_roots)
+G2_roots_trt
+
+```
+
+
+### Figures
+
+```{r}
+# Photosynthetic rate
+A_G2_anno <- data.frame(x1 = c(0.75, 1.25), 
+                               x2 = c(1.25, 1.75), 
+                              y1 = c(16.7, 15.2), 
+                              y2 = c(16.9, 15.4), 
+                              xstar = c(1, 1.5), 
+                              ystar = c(17.1, 15.5),
+                   lab = c("*", "*"))
+A_G2_anno 
+
+A_plot <- ggplot(data=group1, aes(x=Treatment_G1, y=A)) + 
+  geom_boxplot(aes(color=Treatment_G1G2)) + 
+  scale_color_manual(name = "G1_G2 Treatment",
+                     values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), 
+                     labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="G1 Treatment", y="Photosynth. Rate (µmol/m²s)", title = "B.1", tag = "B (USA)") + 
+  my_theme + theme(legend.position="none", plot.tag = element_text(face="bold"), axis.text.x=element_blank(), axis.title.x=element_blank()) + 
+  geom_text(data = A_G2_anno, aes(x = xstar,  y = ystar, label = lab), size=6) +
+  geom_segment(data = A_G2_anno, aes(x = x1, xend = x1, 
+           y = y1, yend = y2),
+           colour = "black") +
+  geom_segment(data = A_G2_anno, aes(x = x2, xend = x2, 
+           y = y1, yend = y2),
+           colour = "black") +
+  geom_segment(data = A_G2_anno, aes(x = x1, xend = x2, 
+           y = y2, yend = y2),
+           colour = "black")
+A_plot
+
+# Stomatal conductance
+gsw_G2_anno <- data.frame(x1 = c(0.75, 1.25, 1.75, 0.75), 
+                               x2 = c(1.25, 1.75, 2.25, 2.25), 
+                              y1 = c(0.195, 0.235, 0.245, 0.265), 
+                              y2 = c(0.20, 0.24, 0.25, 0.27), 
+                              xstar = c(1, 1.5, 2, 1.5), 
+                              ystar = c(0.205, 0.245, 0.255, 0.275),
+                   lab = c("***", "***", "**", "**"))
+gsw_G2_anno 
+
+gsw_plot <- ggplot(data=group1, aes(x=Treatment_G1, y=gsw)) + 
+  geom_boxplot(aes(color=Treatment_G1G2)) + 
+  scale_color_manual(name = "G1_G2 Treatment",
+                     values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), 
+                     labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="G1 Treatment", y="Stomatal Conduct. (mol/m²s)", title = "B.2") + 
+  my_theme + theme(legend.position="none", axis.text.x=element_blank(), axis.title.x=element_blank()) + 
+  geom_text(data = gsw_G2_anno, aes(x = xstar,  y = ystar, label = lab), size=6) +
+  geom_segment(data = gsw_G2_anno, aes(x = x1, xend = x1, 
+           y = y1, yend = y2),
+           colour = "black") +
+  geom_segment(data = gsw_G2_anno, aes(x = x2, xend = x2, 
+           y = y1, yend = y2),
+           colour = "black") +
+  geom_segment(data = gsw_G2_anno, aes(x = x1, xend = x2, 
+           y = y2, yend = y2),
+           colour = "black")
+gsw_plot
+
+# Pod Count
+pod_plot <- ggplot(data=G2_plant_data, aes(x=Treatment_G1, y=pod_count)) + 
+  geom_boxplot(aes(color=Treatment_G1G2)) + 
+  scale_color_manual(name = "G1_G2 Treatment",
+                     values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), 
+                     labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="G1 Treatment", y="Pods Per Plant", title = "B.3") + 
+  my_theme + theme(legend.position="none", axis.text.x=element_blank(), axis.title.x=element_blank())
+pod_plot
+
+# Seed Count
+seed_plot <- ggplot(data=G2_plant_data, aes(x=Treatment_G1, y=seed_count)) + 
+  geom_boxplot(aes(color=Treatment_G1G2)) + 
+  scale_color_manual(name = "G1_G2 Treatment",
+                     values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), 
+                     labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="G1 Treatment", y="Seeds Per Plant", title = "B.4") + 
+  my_theme + theme(legend.position="none")
+seed_plot
+
+# Shoot dry weight
+shoot_plot <- ggplot(data=G2_plant_data, aes(x=Treatment_G1, y=shoots)) + 
+  geom_boxplot(aes(color=Treatment_G1G2)) + 
+  scale_color_manual(name = "G1_G2 Treatment",
+                     values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), 
+                     labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="G1 Treatment", y="Weight (g)", title = "G2 Shoot Dry Weight") + 
+  my_theme
+#shoot_plot
+
+# Above_ground dry weight
+above_plot <- ggplot(data=G2_plant_data, aes(x=Treatment_G1, y=total_aboveground)) + 
+  geom_boxplot(aes(color=Treatment_G1G2)) + 
+  scale_color_manual(name = "G1_G2 Treatment",
+                     values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), 
+                     labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="G1 Treatment", y="Above-Ground Mass (g)", title = "B.5") + 
+  my_theme + theme(legend.position="none")
+above_plot
+
+# Root dry weight
+root_plot <- ggplot(data=G2_plant_data, aes(x=Treatment_G1, y=roots)) + 
+  geom_boxplot(aes(color=Treatment_G1G2)) + 
+  scale_color_manual(name = "G1_G2 Treatment",
+                     values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), 
+                     labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="G1 Treatment", y="Root Mass (g)", title = "B.6") + 
+  my_theme + theme(legend.position="none")
+root_plot
+
+MSU_G2_plots <- A_plot + gsw_plot + pod_plot + seed_plot + above_plot + root_plot + plot_layout(ncol=3)
+
+MSU_G2_plots
+```
+
+# INRAE data
+### Statistics
+
+```{r INRAE stats}
+inrae_data <- read.csv("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/INRAE_planthealth.csv")
+
+inrae_G1 <- inrae_data[inrae_data$Generation == "G1",]
+
+inrae_G1_F <- inrae_G1[inrae_G1$Genotype == "Flavert",]
+inrae_G1_RH <- inrae_G1[inrae_G1$Genotype == "Red_Hawk",]
+
+inrae_G2 <- inrae_data[inrae_data$Generation == "G2",]
+
+inrae_G2_F <- inrae_G2[inrae_G2$Genotype == "Flavert",]
+inrae_G2_RH <- inrae_G2[inrae_G2$Genotype == "Red_Hawk",]
+
+# G1 stats
+
+# Pod count
+inrae_G1_F_podcount_trt <- t.test(pod_count ~ Treatment_G1, data=inrae_G1_F)
+inrae_G1_F_podcount_trt
+# p < .001 ***
+
+inrae_G1_RH_podcount_trt <- t.test(pod_count ~ Treatment_G1, data=inrae_G1_RH)
+inrae_G1_RH_podcount_trt
+# p < 0.01 **
+
+# Seed count NS
+inrae_G1_F_seedcount_trt <- t.test(seed_count ~ Treatment_G1, data=inrae_G1_F)
+inrae_G1_F_seedcount_trt
+
+inrae_G1_RH_seedcount_trt <- t.test(seed_count ~ Treatment_G1, data=inrae_G1_RH)
+inrae_G1_RH_seedcount_trt
+
+
+# Total above ground fresh weight NS
+inrae_G1_F_above_trt <- t.test(total_aboveground ~ Treatment_G1, data=inrae_G1_F)
+inrae_G1_F_above_trt
+
+inrae_G1_RH_above_trt <- t.test(total_aboveground ~ Treatment_G1, data=inrae_G1_RH)
+inrae_G1_RH_above_trt
+
+# Root fresh weight NS
+inrae_G1_F_roots_trt <- t.test(roots ~ Treatment_G1, data=inrae_G1_F)
+inrae_G1_F_roots_trt
+
+inrae_G1_RH_roots_trt <- t.test(roots ~ Treatment_G1, data=inrae_G1_RH)
+inrae_G1_RH_roots_trt
+
+# G2 stats
+
+# Pod count
+inrae_F_anova_G2_podcount <- aov(pod_count ~ Treatment_G1G2, data=inrae_G2_F)
+inrae_F_G2_podcount_trt <- t.test(pod_count ~ Treatment_G2, data=inrae_G2_F)
+summary(inrae_F_anova_G2_podcount)
+inrae_F_G2_podcount_trt
+
+inrae_F_G2_tukey_podcount <- tukey_hsd(inrae_G2_F, pod_count ~ Treatment_G1G2)
+inrae_F_G2_tukey_podcount
+
+inrae_RH_anova_G2_podcount <- aov(pod_count ~ Treatment_G1G2, data=inrae_G2_RH)
+inrae_RH_G2_podcount_trt <- t.test(pod_count ~ Treatment_G2, data=inrae_G2_RH)
+summary(inrae_RH_anova_G2_podcount)
+inrae_RH_G2_podcount_trt
+
+inrae_RH_G2_tukey_podcount <- tukey_hsd(inrae_G2_RH, pod_count ~ Treatment_G1G2)
+inrae_RH_G2_tukey_podcount
+
+
+# Seed count
+inrae_F_anova_G2_seedcount <- aov(seed_count ~ Treatment_G1G2, data=inrae_G2_F)
+inrae_F_G2_seedcount_trt <- t.test(seed_count ~ Treatment_G2, data=inrae_G2_F)
+summary(inrae_F_anova_G2_seedcount)
+inrae_F_G2_seedcount_trt
+
+inrae_F_G2_tukey_seedcount <- tukey_hsd(inrae_G2_F, seed_count ~ Treatment_G1G2)
+inrae_F_G2_tukey_seedcount
+
+inrae_RH_anova_G2_seedcount <- aov(seed_count ~ Treatment_G1G2, data=inrae_G2_RH)
+inrae_RH_G2_seedcount_trt <- t.test(seed_count ~ Treatment_G2, data=inrae_G2_RH)
+summary(inrae_RH_anova_G2_seedcount)
+inrae_RH_G2_seedcount_trt
+
+inrae_RH_G2_tukey_seedcount <- tukey_hsd(inrae_G2_RH, seed_count ~ Treatment_G1G2)
+inrae_RH_G2_tukey_seedcount
+
+
+# Total above ground dry weight
+inrae_F_anova_G2_above <- aov(total_aboveground ~ Treatment_G1G2, data=inrae_G2_F)
+inrae_F_G2_above_trt <- t.test(total_aboveground ~ Treatment_G2, data=inrae_G2_F)
+summary(inrae_F_anova_G2_above)
+inrae_F_G2_above_trt
+
+inrae_F_G2_tukey_above <- tukey_hsd(inrae_G2_F, total_aboveground ~ Treatment_G1G2)
+inrae_F_G2_tukey_above
+
+inrae_RH_anova_G2_above <- aov(total_aboveground ~ Treatment_G1G2, data=inrae_G2_RH)
+inrae_RH_G2_above_trt <- t.test(total_aboveground ~ Treatment_G2, data=inrae_G2_RH)
+summary(inrae_RH_anova_G2_above)
+inrae_RH_G2_above_trt
+
+inrae_RH_G2_tukey_above <- tukey_hsd(inrae_G2_RH, total_aboveground ~ Treatment_G1G2)
+inrae_RH_G2_tukey_above
+
+# Root dry weight
+inrae_F_anova_G2_roots <- aov(roots ~ Treatment_G1G2, data=inrae_G2_F)
+inrae_F_G2_roots_trt <- t.test(roots ~ Treatment_G2, data=inrae_G2_F)
+summary(inrae_F_anova_G2_roots)
+inrae_F_G2_roots_trt
+
+inrae_F_G2_tukey_roots <- tukey_hsd(inrae_G2_F, roots ~ Treatment_G1G2)
+inrae_F_G2_tukey_roots
+
+inrae_RH_anova_G2_roots <- aov(roots ~ Treatment_G1G2, data=inrae_G2_RH)
+inrae_RH_G2_roots_trt <- t.test(roots ~ Treatment_G2, data=inrae_G2_RH)
+summary(inrae_RH_anova_G2_roots)
+inrae_RH_G2_roots_trt
+
+inrae_RH_G2_tukey_roots <- tukey_hsd(inrae_G2_RH, roots ~ Treatment_G1G2)
+inrae_RH_G2_tukey_roots
+```
+
+
+### INRAE Figures
+```{r INRAE_figures, warning=FALSE}
+# code for background theme for ggplot so I don't have to have it in every plot
+my_theme <- theme(panel.background = element_rect(fill = "white", colour = "white"), 
+             panel.grid.major = element_line(size = 0.25, linetype = 'solid', colour = "light gray"),
+             panel.grid.minor = element_line(size = 0.25, linetype = 'solid', colour = "light gray"))
+
+
+
+### G1 Figures
+# Pod Count
+pod_inraeG1_anno <- data.frame(x1 = c(1, 1), x2 = c(2, 2), 
+                   y1 = c(16.5, 8.3), y2 = c(16.8, 8.6), 
+                   xstar = c(1.5, 1.5), ystar = c(17, 8.8),
+                   lab = c("***", "**"),
+                   Genotype = c("Flavert", "Red_Hawk"))
+#pod_inraeG1_anno
+
+pod_plot_G1_inrae <- ggplot(data=inrae_G1, aes(x=Treatment_G1, y=pod_count)) + 
+  geom_boxplot(aes(color=Treatment_G1)) +
+  scale_color_manual(name = "Treatment",
+                     values = c("#3399FF","#FFCC00"), 
+                     labels = c("Control", "Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="Treatment", y="Pods Per Plant", title = "A.1", tag='A (FR)') + 
+  geom_text(data = pod_inraeG1_anno, aes(x = xstar,  y = ystar, label = lab), size=6) +
+  geom_segment(data = pod_inraeG1_anno, aes(x = x1, xend = x1, 
+           y = y1, yend = y2),
+           colour = "black") +
+  geom_segment(data = pod_inraeG1_anno, aes(x = x2, xend = x2, 
+           y = y1, yend = y2),
+           colour = "black") +
+  geom_segment(data = pod_inraeG1_anno, aes(x = x1, xend = x2, 
+           y = y2, yend = y2),
+           colour = "black") +
+  my_theme + facet_wrap(~Genotype) + theme(legend.position="none", plot.tag = element_text(face="bold"), axis.text.x=element_blank(), axis.title.x=element_blank())
+pod_plot_G1_inrae
+
+# Seed Count
+seed_plot_G1_inrae <- ggplot(data=inrae_G1, aes(x=Treatment_G1, y=seed_count)) + 
+  geom_boxplot(aes(color=Treatment_G1)) + 
+  scale_color_manual(name = "Treatment",
+                     values = c("#3399FF","#FFCC00"), 
+                     labels = c("Control", "Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="Treatment", y="Seeds Per Plant", title = "A.2") + 
+  my_theme + facet_wrap(~Genotype) + theme(axis.text.x=element_blank(), axis.title.x=element_blank())
+seed_plot_G1_inrae 
+
+
+# Above_ground fresh weight
+above_plot_G1_inrae <- ggplot(data=inrae_G1, aes(x=Treatment_G1, y=total_aboveground)) + 
+  geom_boxplot(aes(color=Treatment_G1)) + 
+  scale_color_manual(name = "Treatment",
+                     values = c("#3399FF","#FFCC00"), 
+                     labels = c("Control", "Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="Treatment", y="Above-Ground Mass (g)", title = "A.3") + 
+  my_theme + facet_wrap(~Genotype) + theme(legend.position="none")
+above_plot_G1_inrae
+
+# Root fresh weight
+root_plot_G1_inrae <- ggplot(data=inrae_G1, aes(x=Treatment_G1, y=roots)) + 
+  geom_boxplot(aes(color=Treatment_G1)) + 
+  scale_color_manual(name = "Treatment",
+                     values = c("#3399FF","#FFCC00"), 
+                     labels = c("Control", "Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought")) +
+  labs(x="Treatment", y="Root Mass (g)", title = "A.4") + 
+  my_theme  + facet_wrap(~Genotype) + theme(legend.position="none")
+root_plot_G1_inrae
+
+inrae_G1_plots <- pod_plot_G1_inrae + seed_plot_G1_inrae + above_plot_G1_inrae + root_plot_G1_inrae + plot_layout(ncol=2)
+
+inrae_G1_plots
+
+full_g1_plot <- inrae_G1_plots / MSU_G1_plots
+full_g1_plot
+
+ggsave(plot=full_g1_plot, "/Users/Abby/OneDrive - Michigan State University/multigen_analysis/G1_combined_figure.png", width=8, height=12, units="in")
+
+### G2 Figures
+# Pod Count
+
+# Pod Count
+pod_inraeG2_anno <- data.frame(x1 = c(0.75, 0.75, 1.25, 1.75, 0.75, 1.75, 0.75, 1.25), 
+                               x2 = c(1.25, 2.25, 1.75, 2.25, 2.25, 2.25, 1.25, 1.75), 
+                              y1 = c(10.6, 11, 10.2, 10.6, 6, 4.4, 5.1, 4), 
+                              y2 = c(10.8, 11.2, 10.4, 10.8, 6.2, 4.6, 5.3, 4.2), 
+                              xstar = c(1, 1.5, 1.5, 2, 1.5, 2, 1, 1.5), 
+                              ystar = c(11, 11.4, 10.4, 11, 6.4, 4.8, 5.5, 4.4),
+                   lab = c("", "****", "", "", "**", "**", "*", "*"),
+                   Genotype = c("Flavert", "Flavert", "Flavert", "Flavert", "Red_Hawk", "Red_Hawk", "Red_Hawk", "Red_Hawk"))
+pod_inraeG2_anno
+
+pod_plot_G2_inrae <- ggplot(data=inrae_G2, aes(x=Treatment_G1, y=pod_count)) + 
+  geom_boxplot(aes(color=Treatment_G1G2)) + 
+  scale_color_manual(name = "G1_G2 Consecutive Treatment",
+                     values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), 
+                     labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought", "Control", "Drought")) +
+  labs(x="G1 Treatment", y="Pods Per Plant", title = "A.1", tag='A (FR)') + 
+  my_theme  + facet_wrap(~Genotype) + theme(legend.position="none", plot.tag = element_text(face="bold"), axis.text.x=element_blank(), axis.title.x=element_blank()) + 
+  geom_text(data = pod_inraeG2_anno, aes(x = xstar,  y = ystar, label = lab), size=6) +
+  geom_segment(data = pod_inraeG2_anno, aes(x = x1, xend = x1, 
+           y = y1, yend = y2),
+           colour = "black") +
+  geom_segment(data = pod_inraeG2_anno, aes(x = x2, xend = x2, 
+           y = y1, yend = y2),
+           colour = "black") +
+  geom_segment(data = pod_inraeG2_anno, aes(x = x1, xend = x2, 
+           y = y2, yend = y2),
+           colour = "black")
+pod_plot_G2_inrae
+
+# Seed Count
+seed_inraeG2_anno <- data.frame(x1 = c(0.75, 0.75, 1.25, 1.75, 0.75, 1.75, 0.75, 1.25), 
+                               x2 = c(1.25, 2.25, 1.75, 2.25, 2.25, 2.25, 1.25, 1.75), 
+                              y1 = c(43, 45, 41, 43, 17, 15, 15, 13), 
+                              y2 = c(44, 46, 42, 44, 18, 16, 16, 14), 
+                              xstar = c(1, 1.5, 1.5, 2, 1.5, 2, 1, 1.5), 
+                              ystar = c(44, 47, 42, 44, 19, 16, 16, 14),
+                   lab = c("", "***", "", "", "****", "", "", ""),
+                   Genotype = c("Flavert", "Flavert", "Flavert", "Flavert", "Red_Hawk", "Red_Hawk", "Red_Hawk", "Red_Hawk"))
+seed_inraeG2_anno
+
+seed_plot_G2_inrae <- ggplot(data=inrae_G2, aes(x=Treatment_G1, y=seed_count)) + 
+  geom_boxplot(aes(color=Treatment_G1G2)) + 
+  scale_color_manual(name = "G1_G2 Consecutive\nTreatment",
+                     values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), 
+                     labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought", "Control", "Drought")) +
+  labs(x="G1 Treatment", y="Seeds Per Plant", title = "A.2") + 
+  my_theme + facet_wrap(~Genotype) + theme(axis.text.x=element_blank(), axis.title.x=element_blank()) + 
+  geom_text(data = seed_inraeG2_anno, aes(x = xstar,  y = ystar, label = lab), size=6) +
+  geom_segment(data = seed_inraeG2_anno, aes(x = x1, xend = x1, 
+           y = y1, yend = y2),
+           colour = "black") +
+  geom_segment(data = seed_inraeG2_anno, aes(x = x2, xend = x2, 
+           y = y1, yend = y2),
+           colour = "black") +
+  geom_segment(data = seed_inraeG2_anno, aes(x = x1, xend = x2, 
+           y = y2, yend = y2),
+           colour = "black")
+seed_plot_G2_inrae
+
+# Above_ground weight
+above_inraeG2_anno <- data.frame(x1 = c(0.75, 0.75, 1.25, 1.75, 0.75, 1.75, 0.75, 1.25, 1.25), 
+                               x2 = c(1.25, 2.25, 1.75, 2.25, 2.25, 2.25, 1.25, 1.75, 2.25), 
+                              y1 = c(55, 57, 46, 48, 52, 45, 50, 43, 31), 
+                              y2 = c(56, 58, 47, 49, 53, 46, 51, 44, 32), 
+                              xstar = c(1, 1.5, 1.5, 2, 1.5, 2, 1, 1.5, 1.75), 
+                              ystar = c(56, 59, 47, 49, 54, 46, 51, 45, 33),
+                   lab = c("", "***", "", "", "****", "", "", "", "*"),
+                   Genotype = c("Flavert", "Flavert", "Flavert", "Flavert", "Red_Hawk", "Red_Hawk", "Red_Hawk", "Red_Hawk", "Red_Hawk"))
+above_inraeG2_anno
+
+above_plot_G2_inrae <- ggplot(data=inrae_G2, aes(x=Treatment_G1, y=total_aboveground)) + 
+  geom_boxplot(aes(color=Treatment_G1G2)) + 
+  scale_color_manual(name = "G1_G2 Treatment",
+                     values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), 
+                     labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought", "Control", "Drought")) +
+  labs(x="G1 Treatment", y="Above-Ground Mass (g)", title = "A.3") + 
+  my_theme + facet_wrap(~Genotype) + theme(legend.position="none") + 
+  geom_text(data = above_inraeG2_anno, aes(x = xstar,  y = ystar, label = lab), size=6) +
+  geom_segment(data = above_inraeG2_anno, aes(x = x1, xend = x1, 
+           y = y1, yend = y2),
+           colour = "black") +
+  geom_segment(data = above_inraeG2_anno, aes(x = x2, xend = x2, 
+           y = y1, yend = y2),
+           colour = "black") +
+  geom_segment(data = above_inraeG2_anno, aes(x = x1, xend = x2, 
+           y = y2, yend = y2),
+           colour = "black")
+above_plot_G2_inrae
+
+# Root weight
+root_inraeG2_anno <- data.frame(x1 = c(1.25, 0.75, 1.75, 0.75), 
+                               x2 = c(1.75, 1.25, 2.25, 2.25), 
+                              y1 = c(3.6, 3.8, 3.8, 4.1), 
+                              y2 = c(3.7, 3.9, 3.9, 4.2), 
+                              xstar = c(1.5, 1, 2, 1.5), 
+                              ystar = c(3.75, 3.95, 3.95, 4.25),
+                   lab = c("*", "**", "*", "*"),
+                   Genotype = c("Red_Hawk", "Red_Hawk", "Red_Hawk", "Red_Hawk"))
+root_inraeG2_anno
+
+root_plot_G2_inrae <- ggplot(data=inrae_G2, aes(x=Treatment_G1, y=roots)) + 
+  geom_boxplot(aes(color=Treatment_G1G2)) + 
+  scale_color_manual(name = "G1_G2 Treatment",
+                     values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), 
+                     labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_x_discrete(labels=c("Control", "Drought", "Control", "Drought")) +
+  labs(x="G1 Treatment", y="Root Mass (g)", title = "A.4") + 
+  my_theme + facet_wrap(~Genotype) + theme(legend.position="none") + 
+  geom_text(data = root_inraeG2_anno, aes(x = xstar,  y = ystar, label = lab), size=6) +
+  geom_segment(data = root_inraeG2_anno, aes(x = x1, xend = x1, 
+           y = y1, yend = y2),
+           colour = "black") +
+  geom_segment(data = root_inraeG2_anno, aes(x = x2, xend = x2, 
+           y = y1, yend = y2),
+           colour = "black") +
+  geom_segment(data = root_inraeG2_anno, aes(x = x1, xend = x2, 
+           y = y2, yend = y2),
+           colour = "black")
+root_plot_G2_inrae
+
+
+inrae_G2_plots <- pod_plot_G2_inrae + seed_plot_G2_inrae + above_plot_G2_inrae + root_plot_G2_inrae + plot_layout(ncol=2)
+
+inrae_G2_plots
+
+full_g2_plot <- inrae_G2_plots / MSU_G2_plots
+full_g2_plot
+
+ggsave(plot=full_g2_plot, "/Users/Abby/OneDrive - Michigan State University/multigen_analysis/G2_combined_figure.png", width=10, height=12, units="in")
+```
+
+# Germination
+```{r germination}
+germ_data <- read.csv("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/germination_rate_data.csv")
+
+str(germ_data)
+
+germ_data_G0 <- germ_data[germ_data$Generation == "G0",]
+
+germ_data_G1 <- germ_data[germ_data$Generation == "G1",]
+
+germ_data_G2 <- germ_data[germ_data$Generation == "G2",]
+
+germ_rate_G0 <- ggplot(data=germ_data_G0, aes(x=Genotype, y=Germinative_rate)) + 
+   geom_jitter(aes(color=Genotype, shape=Genotype), size =3, width=0.1) + 
+  scale_color_manual(name = "Genotype",
+                     values = c("black","gray"), 
+                     labels = c("Flavert", "Red_Hawk"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_shape_manual(name = "Genotype",
+                     values = c("circle","square"), 
+                     labels = c("Flavert", "Red_Hawk"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  labs(x="Genotype", y="Germination Rate (%)", title = "G0 Seed Germination Rate") + 
+  my_theme
+germ_rate_G0 + facet_wrap(~Experimental_site)
+
+# geom_boxplot(aes(color=Genotype)) +  binaxis='y', stackdir='center',
+
+germ_rate_G1 <- ggplot(data=germ_data_G1, aes(x=Genotype, y=Germinative_rate)) + 
+   geom_point(aes(color=Genotype, shape=Genotype), size =3, width=0.1) + 
+  scale_color_manual(name = "Genotype",
+                     values = c("black","gray"), 
+                     labels = c("Flavert", "Red_Hawk"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_shape_manual(name = "Genotype",
+                     values = c("circle","square"), 
+                     labels = c("Flavert", "Red_Hawk"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  labs(x="Genotype", y="Germination Rate (%)", title = "G1 Seed Germination Rate") + 
+  my_theme
+germ_rate_G1 + facet_grid(Treatment_G1~Experimental_site)
+
+
+germ_rate_G2 <- ggplot(data=germ_data_G2, aes(x=Genotype, y=Germinative_rate)) + 
+   geom_point(aes(color=Genotype, shape=Genotype), size =3, width=0.1) + 
+  scale_color_manual(name = "Genotype",
+                     values = c("black","gray"), 
+                     labels = c("Flavert", "Red_Hawk"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  scale_shape_manual(name = "Genotype",
+                     values = c("circle","square"), 
+                     labels = c("Flavert", "Red_Hawk"), 
+                     guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
+  labs(x="Genotype", y="Germination Rate (%)", title = "G2 Seed Germination Rate") + 
+  my_theme
+germ_rate_G2 + facet_grid(Treatment_G2~Experimental_site)
+```
+
+# Seedling germiantion - MSU
+```{r}
+seedling_data <- read.csv("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/MSU_seedling_height_data.csv", na.strings=c("#N/A", "N/A"), stringsAsFactors = TRUE)
+
+str(seedling_data)
+
+seedling_plot <- ggplot(seedling_data, aes(Treatment_G1, Plant_height_cm, color=Treatment_G2)) + geom_boxplot()
+seedling_plot + facet_wrap(~Generation)
+
+
+
+```
+
