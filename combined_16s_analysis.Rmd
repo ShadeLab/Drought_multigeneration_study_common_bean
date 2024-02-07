@@ -2177,7 +2177,7 @@ tax_iG2rhizoF_g1g2 <- left_join(df_iG2rhizoF_g1g2, INRAE_tax, by="OTUID")
 write.csv(tax_iG2rhizoF_g1g2, "tax_iG2rhizoF_g1g2.csv")
 
 # Flavert root and rhizo venns
-flavert_root_venn <- read.csv("inrae_flavert_root_drought_orders.csv", na.strings = "")
+flavert_root_venn <- read.csv("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/inrae_flavert_root_drought_orders.csv", na.strings = "")
 iG1rootF_drought <- c(flavert_root_venn$G1_Drought)
 iG2rootF_drought <- c(flavert_root_venn$G2_Drought)
 iG2rootF_D_D <- c(flavert_root_venn$G2_D_D)
@@ -2214,7 +2214,7 @@ tax_iG2rhizoRH_g1g2 <- left_join(df_iG2rhizoRH_g1g2, INRAE_tax, by="OTUID")
 write.csv(tax_iG2rhizoRH_g1g2, "tax_iG2rhizoRH_g1g2.csv")
 
 # redhawk rhizo venn
-redhawk_rhizo_venn <- read.csv("inrae_redhawk_rhizo_drought_orders.csv", na.strings = "")
+redhawk_rhizo_venn <- read.csv("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/inrae_redhawk_rhizo_drought_orders.csv", na.strings = "")
 iG1rhizoRH_drought <- c(redhawk_rhizo_venn$G1_Drought)
 iG2rhizoRH_drought <- c(redhawk_rhizo_venn$G2_Drought)
 iG2rhizoRH_D_D <- c(redhawk_rhizo_venn$G2_D_D)
@@ -2234,7 +2234,7 @@ G1_D_D_zRH <- c(intersect(iG1rhizoRH_drought, iG2rhizoRH_D_D))
 ### MSU #####
 ### Roots
 
-MSU_root_venn <- read.csv("combined_root_orders.csv", na.strings="")
+MSU_root_venn <- read.csv("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/combined_root_orders.csv", na.strings="")
 
 G1_Control <- c(MSU_root_venn$G1_Control)
 G1_Drought <- c(MSU_root_venn$G1_Drought)
@@ -2257,7 +2257,7 @@ all_list <- c(intersect(G1_G2_list, G2_D_D))
 
 ### Rhizosphere
 
-MSU_rhizo_venn <- read.csv("msu_drought_rhizo_orders.csv", na.strings="")
+MSU_rhizo_venn <- read.csv("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/msu_drought_rhizo_orders.csv", na.strings="")
 G1_Drought_rhizo <- c(MSU_rhizo_venn$G1_drought)
 G2_Drought_rhizo <- c(MSU_rhizo_venn$G2_drought)
 G2_D_D_rhizo <- c(MSU_rhizo_venn$G2_Drought_Drought)
