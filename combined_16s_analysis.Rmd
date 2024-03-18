@@ -2269,3 +2269,40 @@ G1_G2_list_z <- c(intersect(G1_Drought_rhizo, G2_Drought_rhizo))
 all_list_z <- c(intersect(G1_G2_list_z, G2_D_D_rhizo))
 ```
 
+# overlapping ASVs
+```{r}
+# MSU
+mG1root_csv <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/tax_mG1root.csv", sep=",")
+mG1rhizo_csv <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/indic_mG1rhizo.csv", sep=",")
+mG2root_csv <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/indic_taxa_mG2root_full.csv", sep=",")
+mG2rhizo_csv <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/indic_taxa_mG2rhizo_full.csv", sep=",")
+
+mG1root_drought <- subset(mG1root_csv, mG1root_csv$Group == "Drought")
+mG1rhizo_drought <- subset(mG1rhizo_csv, mG1rhizo_csv$Group == "Drought")
+mG2root_g2drought <- subset(mG2root_csv, mG2root_csv$Group == "G2_Drought")
+mG2root_DD <- subset(mG2root_csv, mG2root_csv$Group == "Drought_Drought")
+mG2rhizo_g2drought <- subset(mG2rhizo_csv, mG2rhizo_csv$Group == "G2_Drought")
+mG2rhizo_DD <- subset(mG2rhizo_csv, mG2rhizo_csv$Group == "Drought_Drought")
+
+mG1root_drought_asv <- c(mG1root_drought$OTUID)
+mG1rhizo_drought_asv <- c(mG1rhizo_drought$OTUID)
+mG2root_g2drought_asv <- c(mG2root_g2drought$OTUID)
+mG2root_DD_asv <- c(mG2root_DD$OTUID)
+mG2rhizo_g2drought_asv <- c(mG2rhizo_g2drought$OTUID)
+mG2rhizo_DD_asv <- c(mG2rhizo_DD$OTUID)
+ 
+root_g1_g2_overlap <- intersect(mG1root_drought_asv, mG2root_g2drought_asv) #2!!! "3a66a38841ba6877568198b9dac3a1dc" "f5c494fd1da6eac3404c69c863c35c07"
+root_alldrought <- intersect(root_g1_g2_overlap, mG2root_DD) #none
+root_g2_overlap <- intersect(mG2root_DD_asv, mG2root_g2drought_asv) # 1  "4aad5d28a70d09c9aad5df10faf034ac"
+
+rhizo_g1_g2_overlap <- intersect(mG1rhizo_drought_asv, mG2rhizo_g2drought_asv) #none
+rhizo_g1_DD_overlap <- intersect(mG1rhizo_drought_asv, mG2rhizo_DD_asv) #none
+rhizo_g2_overlap <- intersect(mG2rhizo_DD_asv, mG2rhizo_g2drought_asv) # 3 "6545de8776149403f8ca0bb2479a0ccc" "e27c3062c3ebfd305447410c7c7ca1ea" "c7052a9e9a3f0798ba2598aacd114201"
+
+root_rhizo_G1 <- intersect(mG1rhizo_drought_asv, mG1root_drought_asv) #none
+root_rhizo_G2 <- intersect(mG2root_g2drought_asv, mG2rhizo_g2drought_asv) # 2 "47ee012e6bf01ba25c1e9d73e2241846" "7e2b7a47670a5cb9656744205ad8b31f"
+root_rhizo_DD <- intersect(mG2root_DD_asv, mG2rhizo_DD_asv) #none
+
+
+```
+
