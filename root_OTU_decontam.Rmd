@@ -194,6 +194,7 @@ phyloseq_merged_clean_decontam_final
 ## Save phyloseq object for future use
 saveRDS(phyloseq_merged_clean_decontam_final, file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/roots/root_final_phyloseq.rds", compress = TRUE)
 
+
 ```
 
 Removal of contaminants and positive controls removed 0.18% of the total taxa in the samples, leaving 12816 taxa across the 122 true samples

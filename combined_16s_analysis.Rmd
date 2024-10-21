@@ -48,6 +48,7 @@ MSU_phyloseq
 
 saveRDS(MSU_phyloseq, file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/updated_MSU_CD_phyloseq.rds", compress=TRUE)
 ```
+
 # Update metadata in INRAE dataset
 ```{r, echo=FALSE, results='hide'}
 
@@ -77,6 +78,10 @@ saveRDS(INRAE_root_rhizo_CD, file="/Users/Abby/OneDrive - Michigan State Univers
 ```
 # Combine into one phjyloseq object
 ```{r, echo=FALSE}
+INRAE_root_rhizo_CD <- readRDS(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/INRAE_root_rhizo_CD.rds")
+
+MSU_phyloseq <- readRDS(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/updated_MSU_CD_phyloseq.rds")
+
 all_16S_phyloseq <- merge_phyloseq(MSU_phyloseq, INRAE_root_rhizo_CD)
 sample_data(all_16S_phyloseq)
 
@@ -1081,7 +1086,7 @@ mG2rhizo_cap_plot = ggplot(data=mG2rhizo_cap.ord.df, aes(x=MDS1, y=MDS2)) +
 mG2rhizo_cap_plot
 ```
 
-# Compiled bet diversity and dispersion figures
+# Compiled beta diversity and dispersion figures
 ```{r}
 gen1_PCoA_panels <- (iG1rootF_PCoA + iG1rootRH_PCoA + mG1root_PCoA) / (iG1rhizoF_PCoA + iG1rhizoRH_PCoA + mG1rhizo_PCoA) + plot_annotation(tag_levels = 'A')
 
@@ -1586,6 +1591,7 @@ iG2rhizoRH_disper_plot <- ggplot(iG2rhizoRH_BDdata$distances, aes(group, distanc
   theme(legend.position = "none")
 iG2rhizoRH_disper_plot
 ```
+
 # example i found to use betadisper in ggplot
 ```{r}
 # functions ####
@@ -1680,6 +1686,268 @@ ggplot(betadisper_dat$distances, aes(group, distances, col = group)) +
 
 # okay so this works, it's very complicated but once you have the functions it's pretty easy to make all the pieces for each dataset. Will be a little clunky to repeat this for each graph but oh well.
 ```
+
+# relative abundance barplots
+```{r}
+root_16S_gen1
+root_16S_gen2
+rhizo_16S_gen1
+rhizo_16S_gen2
+
+
+# G1 roots
+data.frame(tax_table(root_16S_gen1))
+data.frame(sample_data(root_16S_gen1))
+
+# group by Family
+root_g1_family <- tax_glom(root_16S_gen1, taxrank = "Family", NArm = F)
+root_g1_family.ra <- transform_sample_counts(root_g1_family, function(x) x/sum(x))
+root_g1_family.ra
+sample_data(root_g1_family.ra)
+data.frame(otu_table(root_g1_family.ra))
+fam_tax <- data.frame(tax_table(root_g1_family.ra))
+unique(fam_tax$Order)
+
+df.root_g1_family <- psmelt(root_g1_family.ra) 
+df.root_g1_family$Family <- gsub("f__", "", df.root_g1_family$Family)
+df.root_g1_family$Family <- gsub("Mitochondria", "Rickettsiales", df.root_g1_family$Family)
+
+df.root_g1_family_rhizobiacaea <- filter(df.root_g1_family, Family == "Rhizobiaceae")
+aov_g1_root_rhizobia <- aov(Abundance ~ G1_treatment*Group, data=df.root_g1_family_rhizobiacaea)
+summary(aov_g1_root_rhizobia)
+#                    Df Sum Sq Mean Sq F value Pr(>F)  
+# G1_treatment        1  0.001 0.00141   0.016  0.900  
+# Group               2  0.568 0.28383   3.214  0.048 *
+# G1_treatment:Group  2  0.015 0.00741   0.084  0.920  
+# Residuals          54  4.769 0.08832  
+tukey_g1_root_rhizobia <- tukey_hsd(aov_g1_root_rhizobia)
+tukey_g1_root_rhizobia
+#	Group	INRAE_Red_Hawk	MSU_Red_Hawk	0	-0.236956567	-0.46344512	-0.01046801	0.0384	*
+
+
+df.root_g1_family <- df.root_g1_family %>%
+  summarise(Mean = mean(Abundance), .by = c(Group, G1_treatment, Family)) %>%
+  arrange(-Mean)  
+
+df.root_g1_family$Family <- as.character(df.root_g1_family$Family) #convert to character
+
+#simple way to rename phyla with < 1% abundance
+df.root_g1_family$Family[df.root_g1_family$Mean < 0.005] <- "< 0.5% abund."
+
+#Count # phyla to set color palette
+Count = length(unique(df.root_g1_family$Family))
+Count
+
+
+
+# New facet label names for plant variable
+treatment.labs <- c("G1 Control", "G1 Drought")
+names(treatment.labs) <- c("Control", "Drought")
+
+# Create the plot
+
+colors_a <- paletteer_d("ggthemes::Classic_20")
+colors_b <- paletteer_d("tvthemes::kimPossible") #12
+
+colors_22 <- c(colors_a[1:14], colors_b[11], colors_b[12], colors_a[16:20])
+
+
+plot.root_g1_family <- ggplot(data=df.root_g1_family, aes(x=G1_treatment, y=Mean, fill=Family)) + 
+                      geom_bar(aes(), stat="identity", position="fill") + 
+                      scale_fill_manual(values=colors_22) +
+                      facet_wrap(vars(Group), nrow=1)
+plot.root_g1_family
+
+
+
+# group by Order
+root_g1_order <- tax_glom(root_16S_gen1, taxrank = "Order", NArm = T)
+root_g1_order.ra <- transform_sample_counts(root_g1_order, function(x) x/sum(x))
+root_g1_order.ra
+sample_data(root_g1_order.ra)
+data.frame(otu_table(root_g1_order.ra))
+data.frame(tax_table(root_g1_order.ra))
+
+df.root_g1_order <- psmelt(root_g1_order.ra) 
+df.root_g1_order$Order <- gsub("o__", "", df.root_g1_order$Order)
+df.root_g1_order$Order <- gsub("Chloroplast", "c__Oxyphotobacteria", df.root_g1_order$Order)
+
+df.root_g1_order <- df.root_g1_order %>%
+  summarise(Mean = mean(Abundance), .by = c(Group, G1_treatment, Order)) %>%
+  arrange(-Mean)  
+
+df.root_g1_order$Order <- as.character(df.root_g1_order$Order) #convert to character
+
+#simple way to rename phyla with < 1% abundance
+df.root_g1_order$Order[df.root_g1_order$Mean < 0.005] <- "< 0.5% abund."
+
+#Count # phyla to set color palette
+length(unique(df.root_g1_order$Order))
+
+
+
+
+# New facet label names for plant variable
+treatment.labs <- c("G1 Control", "G1 Drought")
+names(treatment.labs) <- c("Control", "Drought")
+
+# Create the plot
+
+plot.root_g1_order <- ggplot(data=df.root_g1_order, aes(x=G1_treatment, y=Mean, fill=Order)) + 
+                     geom_bar(aes(), stat="identity", position="fill") + facet_wrap(vars(Group), nrow=1)
+plot.root_g1_order
+plot.root_g1_family
+
+
+
+#### keep generations together ####
+all_16S_gen1
+all_16S_gen2
+
+# G1 group by Family
+all_g1_family <- tax_glom(all_16S_gen1, taxrank = "Family", NArm = F)
+all_g1_family.ra <- transform_sample_counts(all_g1_family, function(x) x/sum(x))
+all_g1_family.ra
+sample_data(all_g1_family.ra)
+data.frame(otu_table(all_g1_family.ra))
+fam_tax_all <- data.frame(tax_table(all_g1_family.ra))
+unique(fam_tax_all$Family)
+
+df.all_g1_family <- psmelt(all_g1_family.ra) 
+df.all_g1_family$Family <- gsub("f__", "", df.all_g1_family$Family)
+df.all_g1_family$Family <- gsub("Mitochondria", "Rickettsiales", df.all_g1_family$Family)
+
+# stats on rhizobiaceae
+df.g1_family_rhizobiacaea <- filter(df.all_g1_family, Family == "Rhizobiaceae")
+aov_g1_rhizobia <- aov(Abundance ~ G1_treatment*Compartment*Group, data=df.g1_family_rhizobiacaea)
+summary(aov_g1_rhizobia)
+#                                 Df Sum Sq Mean Sq F value   Pr(>F)    
+# G1_treatment                     1  0.005  0.0047   0.095   0.7586    
+# Compartment                      1  1.264  1.2642  25.613 1.72e-06 ***
+# Group                            2  0.374  0.1868   3.784   0.0258 *  
+# G1_treatment:Compartment         1  0.015  0.0148   0.299   0.5856    
+# G1_treatment:Group               2  0.023  0.0114   0.230   0.7947    
+# Compartment:Group                2  0.213  0.1064   2.156   0.1207    
+# G1_treatment:Compartment:Group   2  0.002  0.0010   0.020   0.9805    
+# Residuals                      108  5.331  0.0494                     
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+tukey_g1_rhizobia <- tukey_hsd(aov_g1_rhizobia)
+tukey_g1_rhizobia
+df.g1_family_rhizo <- filter(df.g1_family_rhizobiacaea, Compartment == "Rhizosphere")
+df.g1_family_rhizoF <- filter(df.g1_family_rhizo, Group == "INRAE_Flavert")
+df.g1_family_rhizoRH <- filter(df.g1_family_rhizo, Group == "INRAE_Red_Hawk")
+aov_rhizoF <- aov(Abundance ~ G1_treatment, data=df.g1_family_rhizoF)
+summary(aov_rhizoF) #NS
+aov_rhizoRH <- aov(Abundance ~ G1_treatment, data=df.g1_family_rhizoRH)
+summary(aov_rhizoRH) #NS
+
+df.all_g1_family <- df.all_g1_family %>%
+  summarise(Mean = mean(Abundance), .by = c(Group, Compartment, G1_treatment, Family)) %>%
+  arrange(-Mean)  
+
+df.all_g1_family$Family <- as.character(df.all_g1_family$Family) #convert to character
+
+#simple way to rename phyla with < 1% abundance
+df.all_g1_family$Family[df.all_g1_family$Mean < 0.01] <- "< 1% abund."
+
+#Count # phyla to set color palette
+length(unique(df.all_g1_family$Family))
+
+
+# New facet label names for plant variable
+group.labs <- c("FRANCE_Flavert", "FRANCE_Red_Hawk", "USA_Red_Hawk")
+names(group.labs) <- c("INRAE_Flavert", "INRAE_Red_Hawk", "MSU_Red_Hawk")
+
+# Create the plot
+
+colors_a <- paletteer_d("ggthemes::Classic_20")
+colors_b <- paletteer_d("tvthemes::kimPossible") #12
+colors_c <- paletteer_dynamic("cartography::multi.pal", 20)
+
+colors_27 <- c(colors_a[1:14], colors_a[16:20], colors_b[12], colors_b[11], colors_b[2:4], colors_b[7:8], colors_c[1])
+
+
+plot.all_g1_family <- ggplot(data=df.all_g1_family, aes(x=G1_treatment, y=Mean, fill=Family, color=Family)) + 
+                      geom_bar(aes(), stat="identity", position="fill") + 
+                      scale_fill_manual(values=colors_27) +
+                        scale_color_manual(values=colors_27) +
+                      facet_grid(rows=vars(Compartment), cols=(vars(Group)), labeller = labeller(Group=group.labs)) + 
+                     guides(fill=guide_legend(ncol=1))+
+                     labs(y= "Mean Relative Abundance", x="G1 Treatment")
+plot.all_g1_family
+
+
+
+# G2 group by Family
+all_g2_family <- tax_glom(all_16S_gen2, taxrank = "Family", NArm = F)
+all_g2_family.ra <- transform_sample_counts(all_g2_family, function(x) x/sum(x))
+all_g2_family.ra
+sample_data(all_g2_family.ra)
+data.frame(otu_table(all_g2_family.ra))
+fam_tax_all_g2 <- data.frame(tax_table(all_g2_family.ra))
+unique(fam_tax_all_g2$Family)
+
+df.all_g2_family <- psmelt(all_g2_family.ra) 
+df.all_g2_family$Family <- gsub("f__", "", df.all_g2_family$Family)
+df.all_g2_family$Family <- gsub("Mitochondria", "Rickettsiales", df.all_g2_family$Family)
+
+# stats on rhizobiaceae
+df.g2_family_rhizobiacaea <- filter(df.all_g2_family, Family == "Rhizobiaceae")
+df.g2_family_rhizo <- filter(df.g2_family_rhizobiacaea, Compartment == "Rhizosphere")
+df.g2_family_rhizoF <- filter(df.g2_family_rhizo, Group == "INRAE_Flavert")
+df.g2_family_rhizoRH <- filter(df.g2_family_rhizo, Group == "INRAE_Red_Hawk")
+aov_g2rhizoF <- aov(Abundance ~ G1_G2, data=df.g2_family_rhizoF)
+summary(aov_g2rhizoF) #NS
+tukey_hsd(aov_g2rhizoF)
+aov_g2rhizoRH <- aov(Abundance ~ G1_G2, data=df.g2_family_rhizoRH)
+summary(aov_g2rhizoRH) #NS
+tukey_hsd(aov_g2rhizoRH)
+
+df.all_g2_family <- df.all_g2_family %>%
+  summarise(Mean = mean(Abundance), .by = c(Group, Compartment, G1_G2, Family)) %>%
+  arrange(-Mean)  
+
+df.all_g2_family$Family <- as.character(df.all_g2_family$Family) #convert to character
+
+#simple way to rename phyla with < 1% abundance
+df.all_g2_family$Family[df.all_g2_family$Mean < 0.01] <- "< 1% abund."
+
+#Count # phyla to set color palette
+length(unique(df.all_g2_family$Family))
+
+
+# New facet label names for plant variable
+group.labs <- c("FRANCE_Flavert", "FRANCE_Red_Hawk", "USA_Red_Hawk")
+names(group.labs) <- c("INRAE_Flavert", "INRAE_Red_Hawk", "MSU_Red_Hawk")
+
+# Create the plot
+
+colors_a <- paletteer_d("ggthemes::Classic_20")
+colors_b <- paletteer_d("tvthemes::kimPossible") #12
+colors_c <- paletteer_dynamic("cartography::multi.pal", 20)
+
+colors_34 <- c("#1F77B4FF", "#AEC7E8FF", "#FF7F0EFF", "#FFBB78FF", "#2CA02CFF", "#98DF8AFF", "#D62728FF", "#FF9896FF", "#9467BDFF", "#C5B0D5FF", "#6B42C8FF", "#8C564BFF", "#C49C94FF", "#E377C2FF", "#C9D73DFF", "#C555CBFF", "#502E71FF", "#C49A3FFF", "#DBDB8DFF", "#D7652DFF", "#CF4C8BFF",  "#17BECFFF", "#9EDAE5FF", "#000000FF", "#5D8D9CFF",  "#C8B693FF", "#FFF9F5FF", "#024663FF", "#70D423FF", "#891604FF", "#FFCE45FF", "#5D734DFF", "#CB7C77FF")
+
+
+plot.all_g2_family <- ggplot(data=df.all_g2_family, aes(x=G1_G2, y=Mean, fill=Family, color=Family)) + 
+                      geom_bar(aes(), stat="identity", position="fill") + 
+                      scale_fill_manual(values=colors_34) +
+                      scale_color_manual(values=colors_34) +
+                      facet_grid(rows=vars(Compartment), cols=(vars(Group)), labeller = labeller(Group=group.labs)) + 
+                     guides(fill=guide_legend(ncol=1))+
+                     labs(y= "Mean Relative Abundance", x="G1_G2 Treatment") +
+                      theme(axis.text.x = element_text(angle = 45, hjust=1))
+plot.all_g2_family
+plot.all_g1_family
+
+
+ggsave(filename="plot.all_g1_family.pdf", plot=plot.all_g1_family, path="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/", width = 12, height =8.5, units= "in", dpi=300)
+
+ggsave(filename="plot.all_g2_family.pdf", plot=plot.all_g2_family, path="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/", width = 12, height =9.5, units= "in", dpi=300)
+```
+
+
 
 
 # Trying standardization for alpha diversity with decostand
@@ -2093,9 +2361,9 @@ df_mG1root <- read.csv("indic_mG1root.csv")
 tax_mG1root <- left_join(df_mG1root, MSU_TAX, by="OTUID")
 write.csv(tax_mG1root, "tax_mG1root.csv")
 
-df_mG1rhizo <- read.csv("indic_mG1rhizo.csv")
+df_mG1rhizo <- read.csv("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/indic_mG1rhizo.csv")
 tax_mG1rhizo <- left_join(df_mG1rhizo, MSU_TAX, by="OTUID")
-write.csv(tax_mG1rhizo, "tax_mG1rhizo.csv")
+write.csv(tax_mG1rhizo, "/Users/Abby/OneDrive - Michigan State University/multigen_analysis/tax_mG1rhizo.csv")
 
 
 
@@ -2271,9 +2539,9 @@ all_list_z <- c(intersect(G1_G2_list_z, G2_D_D_rhizo))
 
 # overlapping ASVs
 ```{r}
-# MSU
+#### MSU ####
 mG1root_csv <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/tax_mG1root.csv", sep=",")
-mG1rhizo_csv <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/indic_mG1rhizo.csv", sep=",")
+mG1rhizo_csv <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/tax_mG1rhizo.csv", sep=",")
 mG2root_csv <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/indic_taxa_mG2root_full.csv", sep=",")
 mG2rhizo_csv <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/indic_taxa_mG2rhizo_full.csv", sep=",")
 
@@ -2304,5 +2572,144 @@ root_rhizo_G2 <- intersect(mG2root_g2drought_asv, mG2rhizo_g2drought_asv) # 2 "4
 root_rhizo_DD <- intersect(mG2root_DD_asv, mG2rhizo_DD_asv) #none
 
 
+#### France ####
+iG1root.rhizoF_csv <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/tax_iG1root.rhizoF_full.csv", sep=",")
+iG2rootF_csv <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/tax_iG2rootF_trt2.csv", sep=",")
+
+iG1rootRH_csv <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/tax_iG1rootRH.csv", sep=",")
+iG1rhizoRH_csv <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/tax_iG1rhizoRH.csv", sep=",")
+iG2rhizoRH_csv <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/tax_iG2rhizoRH_trt2.csv", sep=",")
+
+iG1F_drought <- subset(iG1root.rhizoF_csv, iG1root.rhizoF_csv$Group == "Drought")
+iG1rootF_drought <- subset(iG1F_drought, iG1F_drought$Compartment == "Root")
+iG1rhizoF_drought <- subset(iG1F_drought, iG1F_drought$Compartment == "Rhizosphere")
+iG2rootF_g2drought <- subset(iG2rootF_csv, iG2rootF_csv$Group == "Drought")
+
+iG1rootRH_drought <- subset(iG1rootRH_csv, iG1rootRH_csv$Group == "G1_Drought")
+iG1rhizoRH_drought <- subset(iG1rhizoRH_csv, iG1rhizoRH_csv$Group == "G1_Drought")
+iG2rhizoRH_g2drought <- subset(iG2rhizoRH_csv, iG2rhizoRH_csv$Group == "G2_Drought")
+
+
+#### MSU Pie charts ####
+library(ggpubr)
+
+mG1root_pie <- ggpie(data=mG1root_drought, x="Family", label="Family") 
+mG1rhizo_drought 
+mG2root_g2drought 
+mG2rhizo_g2drought
+
+colors_34 <- c("#1F77B4FF", "#AEC7E8FF", "#FF7F0EFF", "#FFBB78FF", "#2CA02CFF", "#98DF8AFF", "#D62728FF", "#FF9896FF", "#9467BDFF", "#C5B0D5FF", "#6B42C8FF", "#8C564BFF", "#C49C94FF", "#E377C2FF", "#C9D73DFF", "#C555CBFF", "#502E71FF", "#C49A3FFF", "#DBDB8DFF", "#D7652DFF", "#CF4C8BFF",  "#17BECFFF", "#9EDAE5FF", "#000000FF", "#5D8D9CFF",  "#C8B693FF", "#FFF9F5FF", "#024663FF", "#70D423FF", "#891604FF", "#FFCE45FF", "#5D734DFF", "#CB7C77FF")
+
+colors_27
+
+colors_17 <- c("#1F77B4FF", "#1F77B4FF", "#9467BDFF", "#1F77B4FF", "#1F77B4FF", "#F7B6D2FF", "#1F77B4FF", "#1F77B4FF", "#9EDAE5FF", "#024663FF", "#1F77B4FF", "#891604FF", "#1F77B4FF", "#000000aa", "#FFCE45FF",  "#5D734DFF", "#CB7C77FF")
+
+mG1root_drought
+mG1root_drought_df <- data.frame(table(mG1root_drought$Family))
+mG1root_drought_df
+unique(mG1root_drought_df$Var1)
+mG1root_pie <- ggpie(data=mG1root_drought_df, x="Freq", label = "Var1", lab.pos = "out", lab.font = c(3, "plain", "black"), fill = colors_17) 
+mG1root_pie 
+ggsave("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/mG1root_pie.png", mG1root_pie, width=6, height = 5, units="in")
+
+mG1rhizo_drought 
+mG1rhizo_drought_df <- data.frame(table(mG1rhizo_drought$Family))
+mG1rhizo_drought_df
+unique(mG1rhizo_drought_df$Var1)
+colors_9 <- c("#1F77B4FF", "#D62728FF", "#C5B0D5FF", "#1F77B4FF", "#C49C94FF", "#1F77B4FF", "#000000aa", "#000000aa", "#5D734DFF")
+mG1rhizo_pie <- ggpie(data=mG1rhizo_drought_df, x="Freq", label = "Var1", lab.pos = "out", lab.font = c(3, "plain", "black"), fill = colors_9) 
+mG1rhizo_pie 
+ggsave("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/mG1rhizo_pie.png", mG1rhizo_pie, width=6, height = 5, units="in")
+
+mG2root_g2drought 
+mG2root_g2drought_df <- data.frame(table(mG2root_g2drought$Family))
+mG2root_g2drought_df
+unique(mG2root_g2drought_df$Var1)
+colors_25 <- c("#98DF8AFF", "#D62728FF", "#9467BDFF", "#1F77B4FF", "#1F77B4FF", "#1F77B4FF", "#1F77B4FF", "#1F77B4FF", "#BCBD22FF", "#1F77B4FF", "#C49A3FFF", "#1F77B4FF", "#1F77B4FF", "#9EDAE5FF",  "#1F77B4FF", "#1F77B4FF", "#024663FF", "#891604FF", "#1F77B4FF","#1F77B4FF", "#1F77B4FF", "#000000aa", "#1F77B4FF", "#5D734DFF", "#CB7C77FF")
+mG2root_g2drought_pie <- ggpie(data=mG2root_g2drought_df, x="Freq", label = "Var1", lab.pos = "out", lab.font = c(3, "plain", "black"), fill = colors_25) 
+mG2root_g2drought_pie 
+ggsave("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/mG2root_g2drought_pie.png", mG2root_g2drought_pie, width=6, height = 5, units="in")
+
+mG2rhizo_g2drought 
+mG2rhizo_g2drought_df <- data.frame(table(mG2rhizo_g2drought$Family))
+mG2rhizo_g2drought_df
+unique(mG2rhizo_g2drought_df$Var1)
+colors_39 <- c("#1F77B4FF", "#AEC7E8FF","#1F77B4FF","#1F77B4FF", "#FFBB78FF","#1F77B4FF","#98DF8AFF", "#9467BDFF", "#1F77B4FF", "#1F77B4FF",
+               "#1F77B4FF", "#8C564BFF", "#1F77B4FF", "#1F77B4FF", "#1F77B4FF", "#C9D73DFF", "#1F77B4FF", "#1F77B4FF", "#BCBD22FF", "#1F77B4FF",
+               "#1F77B4FF","#1F77B4FF","#1F77B4FF","#1F77B4FF","#1F77B4FF", "#17BECFFF","#1F77B4FF", "#1F77B4FF","#1F77B4FF", "#FFF9F5FF",
+               "#1F77B4FF","#024663FF","#1F77B4FF", "#891604FF", "#1F77B4FF","#1F77B4FF","#000000aa","#FFCE45FF","#1F77B4FF")
+mG2rhizo_g2drought_pie <- ggpie(data=mG2rhizo_g2drought_df, x="Freq", label = "Var1", lab.pos = "out", lab.font = c(3, "plain", "black"), fill = colors_39) 
+mG2rhizo_g2drought_pie 
+ggsave("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/mG2rhizo_g2drought_pie.png", mG2rhizo_g2drought_pie, width=6, height = 5, units="in")
+
+msu_RH_pieplots <- (mG1root_pie + mG1rhizo_pie) / (mG2root_g2drought_pie + mG2rhizo_g2drought_pie )
+msu_RH_pieplots
+
+#### France Pie Charts ####
+iG1rootF_drought 
+iG1rhizoF_drought 
+iG2rootF_g2drought 
+
+colors_34 <- c("#1F77B4FF", "#AEC7E8FF", "#FF7F0EFF", "#FFBB78FF", "#2CA02CFF", "#98DF8AFF", "#D62728FF", "#FF9896FF", "#9467BDFF", "#C5B0D5FF", "#6B42C8FF", "#8C564BFF", "#C49C94FF", "#E377C2FF", "#C9D73DFF", "#C555CBFF", "#502E71FF", "#C49A3FFF", "#DBDB8DFF", "#D7652DFF", "#CF4C8BFF",  "#17BECFFF", "#9EDAE5FF", "#000000FF", "#5D8D9CFF",  "#C8B693FF", "#FFF9F5FF", "#024663FF", "#70D423FF", "#891604FF", "#FFCE45FF", "#5D734DFF", "#CB7C77FF")
+
+colors_27
+
+iG1rootF_drought 
+iG1rootF_drought_df <- data.frame(table(iG1rootF_drought$Family))
+iG1rootF_drought_df
+unique(iG1rootF_drought_df$Var1)
+colors_17_ig1rootF <- c("#FF7F0EFF","#1F77B4FF","#FFBB78FF", "#2CA02CFF", "#D62728FF","#1F77B4FF","#1F77B4FF","#1F77B4FF", "#DBDB8DFF","#D7652DFF",
+                        "#17BECFFF", "#1F77B4FF", "#024663FF","#70D423FF","#891604FF","#1F77B4FF", "#CB7C77FF")
+iG1rootF_pie <- ggpie(data=iG1rootF_drought_df, x="Freq", label = "Var1", lab.pos = "out", lab.font = c(3, "plain", "black"), fill = colors_17_ig1rootF) 
+iG1rootF_pie 
+ggsave("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/iG1rootF_pie.png", iG1rootF_pie, width=6, height = 5, units="in")
+
+iG1rhizoF_drought 
+iG1rhizoF_drought_df <- data.frame(table(iG1rhizoF_drought$Family))
+iG1rhizoF_drought_df
+unique(iG1rhizoF_drought_df$Var1)
+colors_5_ig1rhizoF <- c("#1F77B4FF","#E377C2FF","#1F77B4FF","#1F77B4FF","#CB7C77FF")
+iG1rhizoF_pie <- ggpie(data=iG1rhizoF_drought_df, x="Freq", label = "Var1", lab.pos = "out", lab.font = c(3, "plain", "black"), fill = colors_5_ig1rhizoF) 
+iG1rhizoF_pie 
+ggsave("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/iG1rhizoF_pie.png", iG1rhizoF_pie, width=6, height = 5, units="in")
+
+iG2rootF_g2drought 
+iG2rootF_g2drought_df <- data.frame(table(iG2rootF_g2drought$Family))
+iG2rootF_g2drought_df
+colors_iG2rootF <- c("#D7652DFF","#891604FF")
+iG2rootF_g2drought_pie <- ggpie(data=iG2rootF_g2drought_df, x="Freq", label = "Var1", lab.pos = "out", lab.font = c(3, "plain", "black"), fill = colors_iG2rootF) 
+iG2rootF_g2drought_pie 
+ggsave("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/iG2rootF_g2drought_pie.png", iG2rootF_g2drought_pie, width=6, height = 5, units="in")
+
+
+iG1rootRH_drought 
+iG1rhizoRH_drought 
+iG2rhizoRH_g2drought 
+
+iG1rootRH_drought
+iG1rootRH_drought_df <- data.frame(table(iG1rootRH_drought$Family))
+iG1rootRH_drought_df
+colors_iG1rootRH <- c("#FF7F0EFF", "#DBDB8DFF", "#CB7C77FF")
+iG1rootRH_pie <- ggpie(data=iG1rootRH_drought_df, x="Freq", label = "Var1", lab.pos = "out", lab.font = c(3, "plain", "black"), fill = colors_iG1rootRH) 
+iG1rootRH_pie 
+ggsave("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/iG1rootRH_pie.png", iG1rootRH_pie, width=6, height = 5, units="in")
+
+iG1rhizoRH_drought
+iG1rhizoRH_drought_df <- data.frame(table(iG1rhizoRH_drought$Family))
+iG1rhizoRH_drought_df
+colors_iG1rhizoRH <- c("#AEC7E8FF","#1F77B4FF","#1F77B4FF","#1F77B4FF","#FF7F0EFF","#FFBB78FF","#98DF8AFF", "#6B42C8FF","#8C564BFF","#1F77B4FF",
+                       "#1F77B4FF","#1F77B4FF","#1F77B4FF", "#F7B6D2FF","#C555CBFF","#BCBD22FF", "#1F77B4FF","#5D8D9CFF", "#C8B693FF", "#FFF9F5FF",
+                        "#024663FF", "#1F77B4FF", "#891604FF","#1F77B4FF","#1F77B4FF", "#5D734DFF", "#CB7C77FF")
+iG1rhizoRH_pie <- ggpie(data=iG1rhizoRH_drought_df, x="Freq", label = "Var1", lab.pos = "out", lab.font = c(3, "plain", "black"), fill = colors_iG1rhizoRH) 
+iG1rhizoRH_pie 
+ggsave("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/iG1rhizoRH_pie.png", iG1rhizoRH_pie, width=6, height = 5, units="in")
+
+iG2rhizoRH_g2drought
+iG2rhizoRH_g2drought_df <- data.frame(table(iG2rhizoRH_g2drought$Family))
+iG2rhizoRH_g2drought_df
+colors_iG2rhizoRH_g2drought <- c("#17BECFFF", "#CB7C77FF")
+iG2rhizoRH_g2drought_pie <- ggpie(data=iG2rhizoRH_g2drought_df, x="Freq", label = "Var1", lab.pos = "out", lab.font = c(3, "plain", "black"), fill = colors_iG2rhizoRH_g2drought) 
+iG2rhizoRH_g2drought_pie 
+ggsave("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/iG2rhizoRH_g2drought_pie.png", iG2rhizoRH_g2drought_pie, width=6, height = 5, units="in")
 ```
 
