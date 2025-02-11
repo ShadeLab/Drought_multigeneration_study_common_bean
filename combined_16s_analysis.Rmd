@@ -75,11 +75,18 @@ INRAE_root_rhizo_CD
 sample_data(INRAE_root_rhizo_CD)
 
 saveRDS(INRAE_root_rhizo_CD, file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/INRAE_root_rhizo_CD.rds", compress=TRUE)
+#"INRAE_root_rhizo_CD.rds" is not rarefied data set
+
+# Rarefying to 2500 reads
+set.seed(333)
+INRAE_root_rhizo_CD_rare <- rarefy_even_depth(INRAE_root_rhizo_CD, sample.size = 2500,
+                                         rngseed = 333, replace = FALSE, trimOTUs = TRUE, verbose = TRUE)
+# 10 samples removed, 153 ASVs were removed, 1116 ASVs and 110 samples remaining
 ```
 # Combine into one phjyloseq object
 ```{r, echo=FALSE}
-INRAE_root_rhizo_CD <- readRDS(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/INRAE_root_rhizo_CD.rds")
 
+INRAE_root_rhizo_CD <- readRDS(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/INRAE_root_rhizo_CD_rare.rds") # "INRAE_root_rhizo_CD_rare.rds" is the rarefied dataset at 2500 reads
 MSU_phyloseq <- readRDS(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/updated_MSU_CD_phyloseq.rds")
 
 all_16S_phyloseq <- merge_phyloseq(MSU_phyloseq, INRAE_root_rhizo_CD)
@@ -178,26 +185,30 @@ INRAE_gen1_rhizo <- INRAE_gen1 %>%
 
 # inrae G1 root and rhizo alpha figures:
 inrae_root_g1_alpha <- plot_richness(INRAE_gen1_root, x="Treatment", measures=c("Observed"), 
-                                     color = "Treatment") + geom_boxplot() + 
-  scale_color_manual(name = "Treatment", values = c("#3399FF","#FFCC00"), labels = c("Control", "Drought"), guide = guide_legend(override.aes = list(size = 3), alpha = 1)) + 
+                                     color = "Treatment") + 
+  geom_boxplot() + 
+  eom_point(size=3, shape=21, fill="white")+
+  scale_color_manual(name = "Treatment", values = c("#3399FF","#FFCC00"), labels = c("Control", "Drought"), guide =   guide_legend(override.aes = list(size = 3), alpha = 1)) + 
+  scale_y_continuous(limits = c(40, 200))+
   labs(title="G1 Root Alpha Diversity (FR)") + 
   ylab("ASVs per Root Sample") +
   my_theme + theme(legend.position="none", axis.text.x=element_blank(), 
         axis.title.x=element_blank(), 
         plot.tag = element_text(face="bold")) +
-  facet_wrap(vars(Genotype),nrow=1, scales="free") + 
-  geom_text(inherit.aes=FALSE, data = inrae_rootG1_anno, aes(x = xstar,  y = ystar, label = lab), size=6) +
-  geom_segment(inherit.aes=FALSE, data = inrae_rootG1_anno, aes(x = x1, xend = x1, y = y1, yend = y2), colour = "black") +
-  geom_segment(inherit.aes=FALSE, data = inrae_rootG1_anno, aes(x = x2, xend = x2, y = y1, yend = y2), colour = "black") +
-  geom_segment(inherit.aes=FALSE, data = inrae_rootG1_anno, aes(x = x1, xend = x2, y = y2, yend = y2), colour = "black")
+  facet_wrap(vars(Genotype),nrow=1, scales="free")
+ # There are no significant pairwise comparison between Drought vs Control within Genotype
+ # geom_text(inherit.aes=FALSE, data = inrae_rootG1_anno, aes(x = xstar,  y = ystar, label = lab), size=6) +
+ # geom_segment(inherit.aes=FALSE, data = inrae_rootG1_anno, aes(x = x1, xend = x1, y = y1, yend = y2), colour = "black") +
+ # geom_segment(inherit.aes=FALSE, data = inrae_rootG1_anno, aes(x = x2, xend = x2, y = y1, yend = y2), colour = "black") +
+ # geom_segment(inherit.aes=FALSE, data = inrae_rootG1_anno, aes(x = x1, xend = x2, y = y2, yend = y2), colour = "black")
 
 inrae_root_g1_alpha
 
-inrae_rootG1_anno <- data.frame(x1 = c(1), x2 = c(2), 
-                   y1 = c(243), y2 = c(248), 
-                   xstar = c(1.5), ystar = c(251),
-                   lab = c("*"),
-                   Genotype = c("Flavert"))
+#inrae_rootG1_anno <- data.frame(x1 = c(1), x2 = c(2), 
+                 #  y1 = c(243), y2 = c(248), 
+                 #  xstar = c(1.5), ystar = c(251),
+                 # lab = c("*"),
+                  # Genotype = c("Flavert"))
 # stats
 inrae_root_G1alpha <- estimate_richness(INRAE_gen1_root, measures=c("Observed"))
 inrae_root_G1alpha <- cbind(rownames(inrae_root_G1alpha), inrae_root_G1alpha) 
@@ -212,17 +223,20 @@ iG1root_metadata <- data.frame(sample_data(INRAE_gen1_root))
 
 iG1root_data <- left_join(iG1root_metadata, inrae_root_G1alpha, by="SampleID")
 
-iG1root_stats <- aov(Observed ~ Genotype*G1_treatment, data=iG1root_data)
+iG1root_stats <- aov(Observed ~ Genotype*G1_treatment, data=iG1root_data) 
 summary(iG1root_stats)
+# Genotype 1   7031    7031   6.951 0.0180 *
 iG1root_tukey <- tukey_hsd(iG1root_data, Observed ~ Genotype*G1_treatment)
 iG1root_tukey
 
 # Flavert vs. RH ***
-# Flavert control vs. drought *
+# Flavert control vs. drought NS
 # RH control vs. drought NS
 
 inrae_rhizo_g1_alpha <- plot_richness(INRAE_gen1_rhizo, x="Treatment", measures=c("Observed"), 
-                                     color = "Treatment") + geom_boxplot() + 
+                                     color = "Treatment") + 
+  geom_boxplot() + 
+  geom_point(size=3, shape=21, fill="white")+
   labs(title="G1 Rhizosphere Alpha Diversity (FR)") + 
   ylab("ASVs per Rhizosphere Sample") +
   scale_color_manual(name = "Treatment", values = c("#3399FF","#FFCC00"), labels = c("Control", "Drought"), guide = guide_legend(override.aes = list(size = 3), alpha = 1)) + my_theme + facet_wrap(vars(Genotype),nrow=1, scales="free") + theme(legend.position="none", plot.tag = element_text(face="bold"))
@@ -245,6 +259,8 @@ iG1rhizo_data <- left_join(iG1rhizo_metadata, inrae_rhizo_G1alpha, by="SampleID"
 
 iG1rhizo_stats <- aov(Observed ~ Genotype*G1_treatment, data=iG1rhizo_data)
 summary(iG1rhizo_stats)
+#Genotype 1  17582   17582   4.866 0.0424 *
+#Genotype:G1_treatment  1  17111   17111   4.735 0.0449 *
 iG1rhizo_tukey <- tukey_hsd(iG1rhizo_data, Observed ~ Genotype*G1_treatment)
 iG1rhizo_tukey
 
@@ -266,7 +282,9 @@ MSU_gen1_rhizo <- MSU_gen1 %>%
 
 # inrae G1 root and rhizo alpha figures:
 MSU_root_g1_alpha <- plot_richness(MSU_gen1_root, x="Treatment", measures=c("Observed"), 
-                                     color = "Treatment") + geom_boxplot() + 
+                                     color = "Treatment") + 
+  geom_boxplot() + 
+  geom_point(size=3, shape=21, fill="white")+
   labs(title="(USA)") +
   scale_color_manual(name = "Treatment", values = c("#3399FF","#FFCC00"), labels = c("Control", "Drought"), guide = guide_legend(override.aes = list(size = 3), alpha = 1)) + my_theme + theme(axis.text.x=element_blank(), axis.title.x=element_blank(), axis.title.y=element_blank(), plot.tag = element_text(face="bold")) + facet_wrap(~Genotype)
 
@@ -287,7 +305,9 @@ mG1root_stats
 # NS
 
 MSU_rhizo_g1_alpha <- plot_richness(MSU_gen1_rhizo, x="Treatment", measures=c("Observed"), 
-                                     color = "Treatment") + geom_boxplot() + 
+                                     color = "Treatment") + 
+  geom_boxplot() + 
+  geom_point(size=3, shape=21, fill="white")+
   labs(title="(USA)") +
   scale_color_manual(name = "Treatment", values = c("#3399FF","#FFCC00"), labels = c("Control", "Drought"), guide = guide_legend(override.aes = list(size = 3), alpha = 1)) + my_theme + theme(legend.position="none", axis.title.y=element_blank(), plot.tag = element_text(face="bold")) + facet_wrap(~Genotype)
 
@@ -312,6 +332,14 @@ gen1_full_alpha
 
 
 ggsave(plot=gen1_full_alpha, "/Users/Abby/OneDrive - Michigan State University/multigen_analysis/G1_alpha_figure.png", width=8, height=6, units="in")
+
+### Fig. 4
+
+ggsave(plot=gen1_full_alpha, "/PATH/Fig.4.tif",
+       width=8, height=6,
+       device = "tiff",
+       units= "in", dpi = 400,
+       compression="lzw", bg= "white")
 ```
 
 ### Gen2
@@ -338,7 +366,8 @@ meta_iG2root <- data.frame(sample_data(INRAE_gen2_root))
 data_iG2root <- left_join(meta_iG2root, a_iG2root)
 
 iG2root_alphaplot <- ggplot(data=data_iG2root, aes(x=G1_treatment, y=Observed, group=G1_G2, color = G1_G2)) + 
-  geom_boxplot(position = position_dodge(width = 0.8)) + geom_point(position = position_dodge(width = 0.8)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) + 
+  geom_point(position=position_dodge(width=0.8),aes(group=G1_G2, col=G1_G2),size=3, shape=21, fill="white")+
   labs(title="G2 Root Alpha Diversity (FR)") + 
   scale_color_manual(name = "G1_G2 Consecutive\nTreatment", 
                      values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), 
@@ -352,7 +381,7 @@ iG2root_alphaplot
 
 aov_iG2root <- aov(Observed ~ Genotype*G1_treatment*G2_treatment, data=data_iG2root)
 summary(aov_iG2root)
-# NS
+# #G2_treatment 1  309.0  308.96   4.312 0.0479 *
 iG2root_tukey <- tukey_hsd(data_iG2root, Observed ~ Genotype*G1_treatment*G2_treatment)
 iG2root_tukey
 
@@ -367,15 +396,18 @@ a_iG2rhizo <- read.csv(file="/Users/Abby/OneDrive - Michigan State University/mu
 meta_iG2rhizo <- data.frame(sample_data(INRAE_gen2_rhizo))
 data_iG2rhizo <- left_join(meta_iG2rhizo, a_iG2rhizo)
 
-iG2rhizo_anno <- data.frame(x1 = c(0.75, 0.75, 0.75), x2 = c(1.25, 1.75, 2.25), 
-                   y1 = c(300, 315, 330), y2 = c(305, 320, 335), 
-                   xstar = c(1, 1.25, 1.5), ystar = c(310, 325, 340),
-                   lab = c("*", "****", "****"),
-                   Genotype = c("Flavert", "Flavert", "Flavert"))
+iG2rhizo_anno <- data.frame(x1 = c(0.75, 0.75), x2 = c(1.75, 2.25), 
+                            y1 = c(315, 330), y2 = c(320, 335), 
+                            xstar = c(1.25, 1.5), ystar = c(322, 340),
+                   lab = c("****", "****"),
+                   Genotype = c("Flavert", "Flavert"))
 
 iG2rhizo_alphaplot <- ggplot(data=data_iG2rhizo, aes(x=G1_treatment, y=Observed, group=G1_G2, color = G1_G2)) + 
-  geom_boxplot(position = position_dodge(width = 0.8)) + geom_point(position = position_dodge(width = 0.8)) + ylab("ASVs per Rhizosphere Sample") +
+  geom_boxplot(position = position_dodge(width = 0.8)) + 
+  geom_point(position=position_dodge(width=0.8),aes(group=G1_G2, col=G1_G2),size=3, shape=21, fill="white")+
+  ylab("ASVs per Rhizosphere Sample") +
   labs(title="G2 Rhizosphere Alpha Diversity (FR)") + 
+  scale_y_continuous(limits = c(0, 350))+
   scale_color_manual(name = "G1_G2 Consecutive\nTreatment", 
                      values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), 
                      labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought")) + theme(legend.position="none", plot.tag = element_text(face="bold")) +
@@ -396,12 +428,15 @@ iG2rhizo_alphaplot
 
 aov_iG2rhizo <- aov(Observed ~ Genotype*G1_treatment*G2_treatment, data=data_iG2rhizo)
 summary(aov_iG2rhizo)
+#Genotype                            1  33489   33489  17.708  0.00024 ***
+#G1_treatment                        1  47892   47892  25.325 2.54e-05 ***
+#Genotype:G1_treatment               1  31299   31299  16.550  0.00035 ***
 iG2rhizo_tukey <- tukey_hsd(data_iG2rhizo, Observed ~ Genotype*G1_treatment*G2_treatment)
 iG2rhizo_tukey
 # Fl vs. RH  ***
-# Fl G1 C vs. Fl G1 D *** 
+# G1_treatment  Control vs Drought 0.0000259  ****
+# Fl G1 C vs.  Fl G1 D ***
 # Fl C_C - D_C ****
-# Fl C_C - C_D *
 # Fl C_C - D_D ****
 
 iG2root_alphaplot
@@ -427,8 +462,10 @@ meta_mG2root <- data.frame(sample_data(MSU_gen2_root))
 data_mG2root <- left_join(meta_mG2root, a_mG2root)
 
 mG2root_alphaplot <- ggplot(data=data_mG2root, aes(x=G1_treatment, y=Observed, group=G1_G2, color = G1_G2)) + 
-  geom_violin(position = position_dodge(width = 0.8)) + geom_point(position = position_dodge(width = 0.8)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  geom_point(position=position_dodge(width=0.8),aes(group=G1_G2, col=G1_G2),size=3, shape=21, fill="white")+
   labs(title="(USA)") + 
+  scale_y_continuous(limits = c(300, 1600))+
   scale_color_manual(name = "G1_G2 Consecutive\nTreatment", 
                      values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), 
                      labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought")) + ylab("ASVs per Root Sample") + 
@@ -455,8 +492,10 @@ meta_mG2rhizo <- data.frame(sample_data(MSU_gen2_rhizo))
 data_mG2rhizo <- left_join(meta_mG2rhizo, a_mG2rhizo)
 
 mG2rhizo_alphaplot <- ggplot(data=data_mG2rhizo, aes(x=G1_treatment, y=Observed, group=G1_G2, color = G1_G2)) + 
-  geom_violin(position = position_dodge(width = 0.8)) + geom_point(position = position_dodge(width = 0.8)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  geom_point(position=position_dodge(width=0.8),aes(group=G1_G2, col=G1_G2),size=3, shape=21, fill="white")+
   labs(title="(USA)") + 
+  scale_y_continuous(limits = c(500, 2550))+
   scale_color_manual(name = "G1_G2 Consecutive\nTreatment", 
                      values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), 
                      labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought")) + ylab("ASVs per Root Sample") + 
@@ -478,12 +517,21 @@ gen2_full_alpha
 
 
 ggsave(plot=gen2_full_alpha, "/Users/Abby/OneDrive - Michigan State University/multigen_analysis/G2_alpha_figure.png", width=11, height=8, units="in")
+
+## Fig. 5
+
+ggsave(plot=gen2_full_alpha, "/PATH/Fig.5.tif",
+       width=11, height=8,
+       device = "tiff",
+       units= "in", dpi = 400,
+       compression="lzw", bg= "white")
 ```
 
 
 # Beta diversity INRAE
 ```{r}
-INRAE_root_rhizo_CD <- readRDS(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/INRAE_root_rhizo_CD.rds")
+# read the rarefied data set
+INRAE_root_rhizo_CD <- readRDS(file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/INRAE_root_rhizo_CD_rare.rds")
 
 INRAE_gen1 <- INRAE_root_rhizo_CD %>%
   ps_filter(Generation == "G1")
@@ -581,7 +629,7 @@ iG1rootF_PCoA
 #change colors, title, etc.
 iG1rootF_PCoA <- iG1rootF_PCoA  +   
   geom_point(aes(color=Treatment, shape=Treatment), size=3, alpha=1) +
-  labs(title = "(FR) G1 Roots", x="PCoA1 [56.1%]", y="PCoA2 [27.7%]") +
+  labs(title = "(FR) G1 Roots", x="PCoA1 [61.8%]", y="PCoA2 [17.7%]") +
   scale_color_manual(name = "G1 Treatment",
     values = c("#3399FF","#FFCC00"), labels = c("Control", "Drought"), 
     guide = guide_legend(override.aes = list(size = 3), alpha = 1) ) +
@@ -604,7 +652,7 @@ iG1rootRH_PCoA
 #change colors, title, etc.
 iG1rootRH_PCoA <- iG1rootRH_PCoA  +   
   geom_point(aes(color=Treatment, shape=Treatment), size=3, alpha=1) +
-  labs(title = "(FR) G1 Roots", x="PCoA1 [38.8%]", y="PCoA2 [18.5%]") +
+  labs(title = "(FR) G1 Roots", x="PCoA1 [40.9%]", y="PCoA2 [19.9%]") +
   scale_color_manual(name = "G1 Treatment",
     values = c("#3399FF","#FFCC00"), labels = c("Control", "Drought"), 
     guide = guide_legend(override.aes = list(size = 3), alpha = 1) ) +
@@ -625,9 +673,7 @@ set.seed(8)
 iG1rhizo_BC_adonis <- adonis2(formula = iG1rhizo_BCdist ~ Genotype*G1_treatment, permutations = perm_iG1rhizo, data = meta_iG1rhizo)
 
 iG1rhizo_BC_adonis
-# Genotype *
-# G1_treatment **
-# Genotype*treatment *
+# G1_treatment  1  0.20079 0.08549 1.6993 0.0337 *
 
 # Flavert G1 rhizo
 perm_iG1rhizoF <- how(nperm = 9999) 
@@ -639,7 +685,7 @@ set.seed(8)
 iG1rhizoF_BC_adonis <- adonis2(formula = iG1rhizoF_BCdist ~ G1_treatment, permutations = perm_iG1rhizoF, data = meta_iG1rhizoF)
 
 iG1rhizoF_BC_adonis
-# G1 treatment **
+# G1 treatment *
 
 # RedHawk G1 rhizo
 perm_iG1rhizoRH <- how(nperm = 9999) 
@@ -651,7 +697,7 @@ set.seed(8)
 iG1rhizoRH_BC_adonis <- adonis2(formula = iG1rhizoRH_BCdist ~ G1_treatment, permutations = perm_iG1rhizoRH, data = meta_iG1rhizoRH)
 
 iG1rhizoRH_BC_adonis
-# G1 treatment *
+# NS
 
 
 # Flavert G1 rhizo figure
@@ -666,7 +712,7 @@ iG1rhizoF_PCoA
 #change colors, title, etc.
 iG1rhizoF_PCoA <- iG1rhizoF_PCoA  +   
   geom_point(aes(color=Treatment, shape=Treatment), size=3, alpha=1) +
-  labs(title = "(FR) G1 Rhizosphere", x="PCoA1 [34.2%]", y="PCoA2 [11.8%]", caption="Treatment **") +
+  labs(title = "(FR) G1 Rhizosphere", x="PCoA1 [32.1%]", y="PCoA2 [12%]", caption="Treatment *") +
   scale_color_manual(name = "G1 Treatment",
     values = c("#3399FF","#FFCC00"), labels = c("Control", "Drought"), 
     guide = guide_legend(override.aes = list(size = 3), alpha = 1) ) +
@@ -689,7 +735,7 @@ iG1rhizoRH_PCoA
 #change colors, title, etc.
 iG1rhizoRH_PCoA <- iG1rhizoRH_PCoA  +   
   geom_point(aes(color=Treatment, shape=Treatment), size=3, alpha=1) +
-  labs(title = "(FR) G1 Rhizosphere", x="PCoA1 [29.5%]", y="PCoA2 [23.0%]", caption="Treatment *") +
+  labs(title = "(FR) G1 Rhizosphere", x="PCoA1 [33.4%]", y="PCoA2 [13.4%]") +
   scale_color_manual(name = "G1 Treatment",
     values = c("#3399FF","#FFCC00"), labels = c("Control", "Drought"), 
     guide = guide_legend(override.aes = list(size = 3), alpha = 1) ) +
@@ -728,10 +774,8 @@ iG2rootF_BC_adonis
 
 iG2rootF_pairwise <- pairwise.adonis2(iG2rootF_BCdist ~ G1_G2, data = meta_iG2rootF, permutations = perm_iG2rootF)
 iG2rootF_pairwise
-
-# Control_Control_vs_Drought_Control  **
-# Control_Drought_vs_Drought_Drought  0.06
-# Drought_Control_vs_Drought_Drought  *
+# Control_Drought_vs_Drought_Drought G1_G2     1  0.40809 0.42768 5.2309 0.0081 **
+# Drought_Control_vs_Drought_Drought G1_G2     1  0.37378 0.33426 4.0168 0.0615
 
 
 # RedHawk G2 root
@@ -759,8 +803,8 @@ iG2rootF_PCoA
 #change colors, title, etc.
 iG2rootF_PCoA <- iG2rootF_PCoA  +   
   geom_point(aes(color=G1_G2, shape=G1_treatment), size=3, alpha=1) +
-  labs(title = "(FR) G2 Roots", x="PCoA1 [43.4%]", y="PCoA2 [34.7%]",
-       caption = "C_C vs D_C **    D_C vs D_D *    C_D vs D_D p=0.06") +
+  labs(title = "(FR) G2 Roots", x="PCoA1 [81.9%]", y="PCoA2 [10.8%]",
+       caption = "G1 x G2 *")+
   scale_color_manual(name = "G1_G2 Consecutive\nTreatment",
     values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought"), guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
    scale_shape_manual(name = "G1 Treatment",
@@ -780,7 +824,7 @@ iG2rootRH_PCoA
 #change colors, title, etc.
 iG2rootRH_PCoA <- iG2rootRH_PCoA  +   
   geom_point(aes(color=G1_G2, shape=G1_treatment), size=3, alpha=1) +
-  labs(title = "(FR) G2 Roots", x="PCoA1 [68.8%]", y="PCoA2 [17.3%]") +
+  labs(title = "(FR) G2 Roots", x="PCoA1 [86.4%]", y="PCoA2 [6.5%]") +
   scale_color_manual(name = "G1_G2 Consecutive\nTreatment",
     values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought"), guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
    scale_shape_manual(name = "G1 Treatment",
@@ -801,9 +845,10 @@ set.seed(8)
 iG2rhizo_BC_adonis <- adonis2(formula = iG2rhizo_BCdist ~ Genotype*G1_treatment*G2_treatment, permutations = perm_iG2rhizo, data = meta_iG2rhizo)
 
 iG2rhizo_BC_adonis
-# Genotype **
-# G1 ***
-# G2 *
+#Genotype                            1   0.3823 0.06229 2.6091 0.0008 ***
+#G1_treatment                        1   0.4253 0.06930 2.9027 0.0001 ***
+#G2_treatment                        1   0.3301 0.05379 2.2530 0.0039 ** 
+#Genotype:G1_treatment               1   0.4060 0.06616 2.7709 0.0005 ***
 
 # Flavert G2 rhizo
 perm_iG2rhizoF <- how(nperm = 9999) 
@@ -816,6 +861,17 @@ iG2rhizoF_BC_adonis <- adonis2(formula = iG2rhizoF_BCdist ~ G1_treatment*G2_trea
 
 iG2rhizoF_BC_adonis
 # G1 ***
+# G2  1   0.2529 0.07526 1.6189 0.0514
+# G1 x G2 0.2380 0.07083 1.5236 0.0555
+
+# pairwise
+iG2rhizoF_pairwise <- pairwise.adonis2(iG2rhizoF_BCdist ~ G1_G2, data = meta_iG2rhizoF, permutations = perm_iG2rhizoF)
+iG2rhizoF_pairwise
+# C_C vs C_D 0.23008 2.0919 0.0076 **
+# C_C vs D_D 0.34351 4.1859 0.0088 **
+# C_C vs D_C 0.39111 4.4963 0.0102 *
+# C_D vs D_D 0.25361 2.3785 0.0083 **
+# C_D vs D_C 0.27233 2.2455 0.0316 *
 
 # RedHawk G2 rhizo
 perm_iG2rhizoRH <- how(nperm = 9999) 
@@ -827,7 +883,7 @@ set.seed(8)
 iG2rhizoRH_BC_adonis <- adonis2(formula = iG2rhizoRH_BCdist ~ G1_treatment*G2_treatment, permutations = perm_iG2rhizoRH, data = meta_iG2rhizoRH)
 
 iG2rhizoRH_BC_adonis
-# G2 p = 0.053
+# G2_treatment 1  0.20922 0.08737 1.5289 0.0624 .
 
 
 # Flavert G2 rhizo figure
@@ -842,7 +898,8 @@ iG2rhizoF_PCoA
 #change colors, title, etc.
 iG2rhizoF_PCoA <- iG2rhizoF_PCoA  +   
   geom_point(aes(color=G1_G2, shape=G1_treatment), size=3, alpha=1) +
-  labs(title = "(FR) G2 Rhizosphere", x="PCoA1 [36.5%]", y="PCoA2 [17.4%]", caption="G1 Treatment ***") +
+  labs(title = "(FR) G2 Rhizosphere", x="PCoA1 [25.4%]", y="PCoA2 [19.9%]", 
+       caption="G1 Treatment ***\nG2 Treatment [p-val=0.051]\nG1 x G2 [p-val=0.055]") +
   scale_color_manual(name = "G1_G2 Consecutive\nTreatment",
     values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought"), guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
    scale_shape_manual(name = "G1 Treatment",
@@ -862,14 +919,12 @@ iG2rhizoRH_PCoA
 #change colors, title, etc.
 iG2rhizoRH_PCoA <- iG2rhizoRH_PCoA  +   
   geom_point(aes(color=G1_G2, shape=G1_treatment), size=3, alpha=1) +
-  labs(title = "(FR) G2 Rhizosphere", x="PCoA1 [17.1%]", y="PCoA2 [15.8%]", caption="G2 Treatment p = 0.053") +
+  labs(title = "(FR) G2 Rhizosphere", x="PCoA1 [21.7%]", y="PCoA2 [13.3%]")+
   scale_color_manual(name = "G1_G2 Consecutive\nTreatment",
     values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought"), guide = guide_legend(override.aes = list(size = 3), alpha = 1)) +
    scale_shape_manual(name = "G1 Treatment",
     values = c("circle", "triangle"), labels = c("Control", "Drought"), guide = guide_legend(override.aes = list(size = 3), alpha = 1)) + my_theme + theme(plot.tag = element_text(face="bold"), legend.position="none") + facet_wrap(~Genotype)
 iG2rhizoRH_PCoA
-
-
 
 ```
 
@@ -1094,6 +1149,14 @@ gen1_PCoA_panels
 
 ggsave(gen1_PCoA_panels, file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/gen1_PCoA.png", width = 9, height = 6, units="in")
 
+## Fig.6
+ggsave(plot=gen1_PCoA_panels, "/PATH/Fig.6.tif",
+       width=9, height=6,
+       device = "tiff",
+       units= "in", dpi = 400,
+       compression="lzw", bg= "white")
+
+
 
 gen2_PCoA_panels <- (iG2rootF_PCoA + iG2rootRH_PCoA + mG2root_cap_plot) / (iG2rhizoF_PCoA + iG2rhizoRH_PCoA + mG2rhizo_cap_plot) + plot_annotation(tag_levels = 'A')
 
@@ -1101,14 +1164,28 @@ gen2_PCoA_panels
 
 ggsave(gen2_PCoA_panels, file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/gen2_PCoA.png", width = 12, height = 8, units="in")
 
+## Fig.7
+ggsave(plot=gen2_PCoA_panels, "/PATH/Fig.7.tif",
+       width=12, height=8,
+       device = "tiff",
+       units= "in", dpi = 400,
+       compression="lzw", bg= "white")
 
-beta_dispersion_plots <- iG2rootF_disper_plot + iG2rhizoF_disper_plot + mG2rhizo_disper_plot + plot_annotation(tag_levels = 'A')
+beta_dispersion_plots <- iG2rootRH_disper_plot+iG2rhizoF_disper_plot + mG2rhizo_disper_plot2 + plot_annotation(tag_levels = 'A')
 
 beta_dispersion_plots
 
-beta_dispersion <- iG2rootF_disper_plot + iG2rhizoF_disper_plot + mG2rhizo_disper_plot + plot_annotation(tag_levels = 'A')
+beta_dispersion <- iG2rootRH_disper_plot+iG2rhizoF_disper_plot + mG2rhizo_disper_plot2 + plot_annotation(tag_levels = 'A')
 
 ggsave(beta_dispersion, file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/beta_dispersion_Fig7.png", width = 10, height = 5, units="in")
+
+## Fig. 8
+ggsave(plot=beta_dispersion_plots, "/PATH/Fig.8.tif",
+       width=10, height=5,
+       device = "tiff",
+       units= "in", dpi = 400,
+       compression="lzw", bg= "white")
+
 ```
 
 # Beta dispersion
@@ -1254,7 +1331,7 @@ iG1rootRH_disper_plot
 # INRAE G1 rhizo
 
 # Flavert
-iG1rhizoF_betadisper <- betadisper(iG1rhizoF_BCdist, group=as.factor(meta_iG1rhizoF$G1_treatment), type = "centroid")
+iG1rhizoF_betadisper <- betadisper(iG1rhizoF_BCdist, group=as.factor(meta_iG1rhizoF$G1_treatment), type = "median")
 iG1rhizoF_betadisper
 
 permutest(iG1rhizoF_betadisper, pairwise=TRUE, permutations=999)
@@ -1395,10 +1472,11 @@ mG2rhizo_disper_plot <- ggplot(mG2rhizo_BDdata$distances, aes(group, distances, 
   my_theme + labs(title="(USA) G2 RedHawk Rhizosphere") +
   scale_color_manual(name="G1_G2 Consecutive\nTreatment", values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought")) +
   ylab('') + xlab("") +
-  scale_x_discrete(labels = c("C_C", 'C_D', "D_C", "D_D")) + labs(caption="G2 Treatment *") + theme(plot.tag = element_text(face="bold")) 
-mG2rhizo_disper_plot
-
-+ 
+  scale_x_discrete(labels = c("C_C", 'C_D', "D_C", "D_D")) + 
+  labs(caption="G2 Treatment *") + 
+  theme(plot.tag = element_text(face="bold"),
+        plot.caption = element_text(size=13, face="italic")) 
+mG2rhizo_disper_plot2 <- mG2rhizo_disper_plot + 
   geom_text(inherit.aes=FALSE, data = mG2rhizo_BD_anno, aes(x = xstar,  y = ystar, label = lab), size=6) +
   geom_segment(inherit.aes=FALSE, data = mG2rhizo_BD_anno, aes(x = x1, xend = x1, 
            y = y1, yend = y2),
@@ -1409,7 +1487,7 @@ mG2rhizo_disper_plot
   geom_segment(inherit.aes=FALSE, data = mG2rhizo_BD_anno, aes(x = x1, xend = x2, 
            y = y2, yend = y2),
            colour = "black")
-
+mG2rhizo_disper_plot2
 
 ### Inrae
 # G2 root - Flavert
@@ -1418,12 +1496,14 @@ iG2rootF_betadisper_G1 <- betadisper(iG2rootF_BCdist, group=as.factor(meta_iG2ro
 iG2rootF_betadisper_G2 <- betadisper(iG2rootF_BCdist, group=as.factor(meta_iG2rootF$G2_treatment), type = "median")
 
 iG2rootF_betadisper_G1G2 <- betadisper(iG2rootF_BCdist, group=as.factor(meta_iG2rootF$G1_G2), type = "median")
-
+set.seed(8)
 permutest(iG2rootF_betadisper_G1, pairwise=TRUE, permutations=999)
+set.seed(8)
 permutest(iG2rootF_betadisper_G2, pairwise=TRUE, permutations=999)
+set.seed(8)
 permutest(iG2rootF_betadisper_G1G2, pairwise=TRUE, permutations=999)
 TukeyHSD(iG2rootF_betadisper_G1G2)
-# C_C vs C_D significant * with permutest but not tukey
+# NS
 
 boxplot(iG2rootF_betadisper_G1G2)
 
@@ -1438,10 +1518,11 @@ iG2rootF_BDdata$chull <- group_by(iG2rootF_BDdata$eigenvector, group) %>%
   data.frame()
 
 # Now the dataframes are all ready to be completely customisable in ggplot
-iG2rootF_BD_anno <- data.frame(x1 = c(1), x2 = c(2), 
-                   y1 = c(0.49), y2 = c(0.51), 
-                   xstar = c(1.5), ystar = c(0.52),
-                   lab = c("*"))
+
+#iG2rootF_BD_anno <- data.frame(x1 = c(1), x2 = c(2), 
+                  # y1 = c(0.49), y2 = c(0.51), 
+                  # xstar = c(1.5), ystar = c(0.52),
+                  # lab = c("*"))
 
 iG2rootF_disper_plot <- ggplot(iG2rootF_BDdata$distances, aes(group, distances, col = group)) +
   geom_boxplot(outlier.shape = NA, position = position_dodge(width = 0.55)) +
@@ -1450,17 +1531,18 @@ iG2rootF_disper_plot <- ggplot(iG2rootF_BDdata$distances, aes(group, distances, 
   scale_color_manual(name="G1_G2 Consecutive Treatment", values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought")) +
   ylab('Distance to Median') + xlab("") +
   scale_x_discrete(labels = c("C_C", 'C_D', "D_C", "D_D")) +
-  theme(legend.position = "none", plot.tag = element_text(face="bold")) +
-  geom_text(inherit.aes=FALSE, data = iG2rootF_BD_anno, aes(x = xstar,  y = ystar, label = lab), size=6) +
-  geom_segment(inherit.aes=FALSE, data = iG2rootF_BD_anno, aes(x = x1, xend = x1, 
-           y = y1, yend = y2),
-           colour = "black") +
-  geom_segment(inherit.aes=FALSE, data = iG2rootF_BD_anno, aes(x = x2, xend = x2, 
-           y = y1, yend = y2),
-           colour = "black") +
-  geom_segment(inherit.aes=FALSE, data = iG2rootF_BD_anno, aes(x = x1, xend = x2, 
-           y = y2, yend = y2),
-           colour = "black")
+  theme(legend.position = "none", plot.tag = element_text(face="bold")) 
+
+  #geom_text(inherit.aes=FALSE, data = iG2rootF_BD_anno, aes(x = xstar,  y = ystar, label = lab), size=6) +
+  #geom_segment(inherit.aes=FALSE, data = iG2rootF_BD_anno, aes(x = x1, xend = x1, 
+           #y = y1, yend = y2),
+           #colour = "black") +
+  #geom_segment(inherit.aes=FALSE, data = iG2rootF_BD_anno, aes(x = x2, xend = x2, 
+           #y = y1, yend = y2),
+           #colour = "black") +
+  #geom_segment(inherit.aes=FALSE, data = iG2rootF_BD_anno, aes(x = x1, xend = x2, 
+           #y = y2, yend = y2),
+           #colour = "black")
 iG2rootF_disper_plot
 
 # G2 root - RedHawk
@@ -1469,12 +1551,15 @@ iG2rootRH_betadisper_G1 <- betadisper(iG2rootRH_BCdist, group=as.factor(meta_iG2
 iG2rootRH_betadisper_G2 <- betadisper(iG2rootRH_BCdist, group=as.factor(meta_iG2rootRH$G2_treatment), type = "median")
 
 iG2rootRH_betadisper_G1G2 <- betadisper(iG2rootRH_BCdist, group=as.factor(meta_iG2rootRH$G1_G2), type = "median")
-
+set.seed(8)
 permutest(iG2rootRH_betadisper_G1, pairwise=TRUE, permutations=999)
+set.seed(8)
 permutest(iG2rootRH_betadisper_G2, pairwise=TRUE, permutations=999)
+set.seed(8)
 permutest(iG2rootRH_betadisper_G1G2, pairwise=TRUE, permutations=999)
+# Drought_Control vs Control_Drought *
 TukeyHSD(iG2rootRH_betadisper_G1G2)
-# NS
+# But Tukey is NS?
 
 boxplot(iG2rootRH_betadisper_G1G2)
 
@@ -1489,6 +1574,12 @@ iG2rootRH_BDdata$chull <- group_by(iG2rootRH_BDdata$eigenvector, group) %>%
   data.frame()
 
 # Now the dataframes are all ready to be completely customisable in ggplot
+
+iG2rootRH_BD_anno <- data.frame(x1 = c(2), x2 = c(3), 
+                               y1 = c(0.26), y2 = c(0.28),
+                               xstar = c(2.5), ystar = c(0.3),
+                               lab = c("*"))
+
 iG2rootRH_disper_plot <- ggplot(iG2rootRH_BDdata$distances, aes(group, distances, col = group)) +
   geom_boxplot(outlier.shape = NA, position = position_dodge(width = 0.55)) +
   geom_point(size=3, shape=21, fill="white") +
@@ -1496,7 +1587,15 @@ iG2rootRH_disper_plot <- ggplot(iG2rootRH_BDdata$distances, aes(group, distances
   scale_color_manual(name="G1_G2 Consecutive Treatment", values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought")) +
   ylab('Distance to Median') + xlab("G1_G2 Consecutive Treatment") +
   scale_x_discrete(labels = c("C_C", 'C_D', "D_C", "D_D")) +
-  theme(legend.position = "none")
+  theme(legend.position = "none", axis.title.x = element_blank(), plot.tag = element_text(face="bold")) +
+  geom_text(inherit.aes=FALSE, data = iG2rootRH_BD_anno, aes(x = xstar,  y = ystar, label = lab), size=6) +
+  geom_segment(inherit.aes=FALSE, data = iG2rootRH_BD_anno, aes(x = x1, xend = x1, y = y1, yend = y2), 
+               colour = "black") +
+  geom_segment(inherit.aes=FALSE, data = iG2rootRH_BD_anno, aes(x = x2, xend = x2, y = y1, yend = y2),
+               colour = "black") +
+  geom_segment(inherit.aes=FALSE, data = iG2rootRH_BD_anno, aes(x = x1, xend = x2, y = y2, yend = y2),
+               colour = "black")
+
 iG2rootRH_disper_plot
 
 
@@ -1506,14 +1605,18 @@ iG2rhizoF_betadisper_G1 <- betadisper(iG2rhizoF_BCdist, group=as.factor(meta_iG2
 iG2rhizoF_betadisper_G2 <- betadisper(iG2rhizoF_BCdist, group=as.factor(meta_iG2rhizoF$G2_treatment), type = "median")
 
 iG2rhizoF_betadisper_G1G2 <- betadisper(iG2rhizoF_BCdist, group=as.factor(meta_iG2rhizoF$G1_G2), type = "median")
-
+set.seed(8)
 permutest(iG2rhizoF_betadisper_G1, pairwise=TRUE, permutations=999)
+set.seed(8)
 permutest(iG2rhizoF_betadisper_G2, pairwise=TRUE, permutations=999)
+set.seed(8)
 permutest(iG2rhizoF_betadisper_G1G2, pairwise=TRUE, permutations=999)
+# pairwise:
+# C_D vs C_C *
+# D_C vs C_C *
+# D_D vs C_C **
 TukeyHSD(iG2rhizoF_betadisper_G1G2)
-# C_D vs C_C ***
-# C_D vs D_C *
-# C_D vs D_D *
+#Control_Drought-Control_Control  0.25913598  0.03898235 0.47928960 0.0191238
 
 boxplot(iG2rhizoF_betadisper_G1G2)
 
@@ -1528,10 +1631,10 @@ iG2rhizoF_BDdata$chull <- group_by(iG2rhizoF_BDdata$eigenvector, group) %>%
   data.frame()
 
 # Now the dataframes are all ready to be completely customisable in ggplot
-iG2rhizoF_BD_anno <- data.frame(x1 = c(1, 2, 2), x2 = c(2, 3, 4), 
-                   y1 = c(0.15, 0.25, 0.2), y2 = c(0.13, 0.23, 0.18), 
-                   xstar = c(1.5, 2.5, 3), ystar = c(0.11, 0.21, 0.16),
-                   lab = c("***", "*", "*"))
+iG2rhizoF_BD_anno <- data.frame(x1 = c(1, 1, 1), x2 = c(2, 3, 4), 
+                                y1 = c(0.2, 0.15, 0.1), y2 = c(0.18, 0.13, 0.08), 
+                                xstar = c(1.5, 2, 2.5), ystar = c(0.155, 0.105, 0.055),
+                                lab = c("*", "*", "*"))
 
 
 iG2rhizoF_disper_plot <- ggplot(iG2rhizoF_BDdata$distances, aes(group, distances, col = group)) +
@@ -1540,6 +1643,8 @@ iG2rhizoF_disper_plot <- ggplot(iG2rhizoF_BDdata$distances, aes(group, distances
   my_theme + labs(title="(FR) G2 Flavert Rhizo") +
   scale_color_manual(name="G1_G2 Consecutive Treatment", values = c("#3399FF","#99CCFF", "#FFCC00", "#FF6600"), labels = c("Control_Control", "Control_Drought", "Drought_Control", "Drought_Drought")) +
   ylab('') + xlab("") +
+  labs(caption="G1 x G2 **") + 
+  scale_y_continuous(limits = c(0, 0.8))+
   scale_x_discrete(labels = c("C_C", 'C_D', "D_C", "D_D")) +
   theme(legend.position = "none", plot.tag = element_text(face="bold")) + 
   geom_text(inherit.aes=FALSE, data = iG2rhizoF_BD_anno, aes(x = xstar,  y = ystar, label = lab), size=6) +
@@ -1561,9 +1666,11 @@ iG2rhizoRH_betadisper_G1 <- betadisper(iG2rhizoRH_BCdist, group=as.factor(meta_i
 iG2rhizoRH_betadisper_G2 <- betadisper(iG2rhizoRH_BCdist, group=as.factor(meta_iG2rhizoRH$G2_treatment), type = "median")
 
 iG2rhizoRH_betadisper_G1G2 <- betadisper(iG2rhizoRH_BCdist, group=as.factor(meta_iG2rhizoRH$G1_G2), type = "median")
-
+set.seed(8)
 permutest(iG2rhizoRH_betadisper_G1, pairwise=TRUE, permutations=999)
+set.seed(8)
 permutest(iG2rhizoRH_betadisper_G2, pairwise=TRUE, permutations=999)
+set.seed(8)
 permutest(iG2rhizoRH_betadisper_G1G2, pairwise=TRUE, permutations=999)
 TukeyHSD(iG2rhizoRH_betadisper_G1G2)
 # NS
