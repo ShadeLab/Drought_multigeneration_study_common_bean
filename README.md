@@ -38,6 +38,6 @@ Plant phenotypic measurements are located in the R_analysis_files folder. Analys
 This work was supported by the United States Department of Agriculture [grant number 2019-67019-29305](https://portal.nifa.usda.gov/web/crisprojectpages/1018838-inheritance-of-abiotic-stress-tolerance-through-seed-microbiome-modification.html) to AS and MB, and by the Michigan State University [Plant Resilience Institute](https://plantresilience.msu.edu/) to AS. This work was co-funded by the European Union [grant number ERC, MicroRescue, 101087042](https://cordis.europa.eu/project/id/101087042) to AS. Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or the European Research Council. Neither the European Union nor the granting authority can be held responsible for them. AS acknowledges support from the United States Department of Agriculture National Institute of Food and Agriculture and Michigan State University AgBioResearch, and the Centre National de la Recherche Scientifique (CNRS), France. The Angers Plant Phenotyping Platform PHENOTIC (DOI: 10.17180/ykbz-2v85) is acknowledged for the production and phenotyping of plants.
 
 ### More info
-[ShadeLab](http://ashley17061.wixsite.com/shadelab/home)
-[Ecologie Microbienne Lyon](https://www.ecologiemicrobiennelyon.fr/eng)
-[IRHS](https://irhs.angers-nantes.hub.inrae.fr/)
+[ShadeLab](http://ashley17061.wixsite.com/shadelab/home)  
+[Ecologie Microbienne Lyon](https://www.ecologiemicrobiennelyon.fr/eng)  
+[IRHS](https://irhs.angers-nantes.hub.inrae.fr/)  
