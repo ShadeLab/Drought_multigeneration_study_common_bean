@@ -31,6 +31,70 @@ library(indicspecies)
 library(VennDiagram)
 ```
 
+# Rarefaction of MSU sequences
+```{r}
+RR_phyloseq <- readRDS("/Users/Abby/OneDrive - Michigan State University/multigen_analysis/root_rhizo_combined_phyloseq.rds")
+
+#sample_sums(RR_phyloseq)
+
+#check sample metadata
+#sample_data(RR_phyloseq)
+#otu_table(RR_phyloseq)
+
+#rarefaction curve
+# make transposed otu table for rarefaction curves
+transpose_otutable <- t(otu_table(RR_phyloseq))
+class(transpose_otutable) <- "matrix"
+
+#make rarefaction curves (takes a long time to knit so taken out for now)
+#rarecurve(transpose_otutable, step=100, label = FALSE)
+#abline(v=20976, col="red")
+
+# minimum number of reads in a sample is 20976
+# rarefy root+rhizo to 20,976 reads per sample
+set.seed(8)
+RR_rarefied <- rarefy_even_depth(RR_phyloseq, sample.size = 20976, rngseed = TRUE, trimOTUs=FALSE)
+
+# subset to include only control and drought
+
+RR_rarefied
+#sample_sums(RR_rarefied)
+sample_data(RR_rarefied)
+saveRDS(RR_rarefied, file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/root_rhizo_rarefiedphyloseq.rds")
+
+RR_control_drought <- RR_rarefied %>% 
+  ps_filter(Treatment != "Nutrient", .keep_all_taxa = TRUE)
+
+#sample_data(RR_control_drought)
+
+RR_control_drought <- RR_control_drought %>% 
+  ps_filter(G1_treatment != "Nutrient", .keep_all_taxa = TRUE)
+
+#sample_data(RR_control_drought)
+
+saveRDS(RR_control_drought, file="/Users/Abby/OneDrive - Michigan State University/multigen_analysis/root_rhizo_control_drought_rarefiedphyloseq.rds")
+
+
+G1_roots_CD <- RR_control_drought %>% 
+  ps_filter(Generation == "G1", .keep_all_taxa = TRUE) %>% 
+  ps_filter(Compartment == "root", .keep_all_taxa = TRUE)
+
+G2_roots_CD <- RR_control_drought %>% 
+  ps_filter(Generation == "G2", .keep_all_taxa = TRUE) %>% 
+  ps_filter(Compartment == "root", .keep_all_taxa = TRUE)
+
+G1_rhizo_CD <- RR_control_drought %>% 
+  ps_filter(Generation == "G1", .keep_all_taxa = TRUE) %>%
+  ps_filter(Compartment == "rhizosphere", .keep_all_taxa = TRUE)
+
+G2_rhizo_CD <- RR_control_drought %>% 
+  ps_filter(Generation == "G2", .keep_all_taxa = TRUE) %>%
+  ps_filter(Compartment == "rhizosphere", .keep_all_taxa = TRUE)
+
+```
+
+
+
 # Update metadata in MSU combined phyloseq
 ```{r, echo=FALSE, results='hide'}
 
