@@ -1,19 +1,17 @@
 ## Github Repository for
 # Evaluating the legacy of drought exposure on root and rhizosphere bacterial microbiomes over two plant generations.  
-## A Sulesky-Grieb†, AF Bintarti†, J Colovas, B Marolleau, T Boureau, M Simonin, M Barret and A Shade
-<i>This work is submitted for peer review.</i>
+## Bintarti AF, A Sulesky-Grieb, J Colovas, B Marolleau, T Boureau, M Simonin, M Barret and A Shade
+<i>This work is accepted.</i>
 
 
 ### Data
-The raw sequence data for this study are available in the NCBI SRA under bioproject [PRJNA1058980](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1058980/)
-
+The raw sequence data for the Michigan study are available in the NCBI SRA under bioproject [PRJNA1058980](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1058980/).
+The raw sequence data for the Pays de Loires study are available under bioproject [PRJEB65346](https://www.ncbi.nlm.nih.gov/bioproject/?term=PRJEB65346).
 
 ### To cite this work or code
-Coming soon.
+AF Bintarti*, Sulesky-Grieb A*, J Colovas, B Marolleau, T Boureau, M Simonin, M Barret and A Shade. 2026. Evaluating the legacy of drought exposure on root and rhizosphere bacterial microbiomes over two plant generations.  Microbiology Spectrum.  doi coming soon! 
+**contributed equally*
 
-
-### Abstract
-	Drought is a critical risk in developing countries for staple crops like common bean (Phaseolus vulgaris L.). We conducted an experiment to understand the legacy effects of repeated drought exposure across plant generations on the root and rhizosphere microbiome of the common bean, hypothesizing that a legacy of exposure improves overall plant microbiome resilience. We profiled the bacterial microbiome using marker gene amplicon sequencing over two plant generations in a complete factorial design for two common bean genotypes, Red Hawk and Flavert. We also repeated the experiment for Red Hawk in the two distinct production soils of Pays de la Loire, France, and Michigan, USA. Despite clear and relatively consistent drought effects on plant phenotype, there was neither response of the Red Hawk microbiomes to drought, nor a notable legacy of drought exposure. For Flavert, there was a legacy drought effect for the second generation in the rhizosphere microbiome beta diversity. These results suggest that a cross-generational legacy of drought on the belowground plant microbiome may not be consistent and can be affected by soil origin and host genotype. It also suggests a potential for resistance in the belowground plant microbiome to drought. 
 
 
 ### Contents
