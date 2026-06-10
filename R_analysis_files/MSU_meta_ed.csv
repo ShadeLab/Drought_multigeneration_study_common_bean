@@ -1,0 +1,134 @@
+SampleID,Generation,G1_treatment,parent_plant,G2_treatment,G1_G2,Compartment,planting_group,growth_chamber,shelf,CleanID,ExperimentalControl,Treatment,Genotype,Location,Group
+ROOT_G1_C10,G1,Control,G0_bulk,,,root,NA,2,bottom,ro_G1_C10,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G1_C11,G1,Control,G0_bulk,,,root,NA,1,bottom,ro_G1_C11,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G1_C13,G1,Control,G0_bulk,,,root,NA,2,bottom,ro_G1_C13,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G1_C2,G1,Control,G0_bulk,,,root,NA,1,bottom,ro_G1_C2,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G1_C6,G1,Control,G0_bulk,,,root,NA,1,bottom,ro_G1_C6,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G1_D14,G1,Drought,G0_bulk,,,root,NA,2,bottom,ro_G1_D14,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G1_D15,G1,Drought,G0_bulk,,,root,NA,2,bottom,ro_G1_D15,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G1_D7,G1,Drought,G0_bulk,,,root,NA,1,bottom,ro_G1_D7,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G1_D8,G1,Drought,G0_bulk,,,root,NA,2,bottom,ro_G1_D8,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G1_D9,G1,Drought,G0_bulk,,,root,NA,1,bottom,ro_G1_D9,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_110,G2,Control,C12,Drought,Control_Drought,root,2,1,top,ro_G2_110,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_112,G2,Drought,D6,Control,Drought_Control,root,2,1,bottom,ro_G2_112,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_12,G2,Drought,D7,Drought,Drought_Drought,root,1,1,top,ro_G2_12,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_123,G2,Drought,D1B,Drought,Drought_Drought,root,2,1,bottom,ro_G2_123,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_126,G2,Drought,D2B,Drought,Drought_Drought,root,2,1,bottom,ro_G2_126,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_129,G2,Control,C4,Control,Control_Control,root,2,1,bottom,ro_G2_129,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_139,G2,Drought,D2B,Control,Drought_Control,root,2,2,bottom,ro_G2_139,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_146,G2,Control,C12,Control,Control_Control,root,2,2,bottom,ro_G2_146,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_147,G2,Control,C4,Drought,Control_Drought,root,2,2,bottom,ro_G2_147,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_148,G2,Control,C5,Drought,Control_Drought,root,2,2,bottom,ro_G2_148,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_15,G2,Drought,D15,Drought,Drought_Drought,root,1,1,top,ro_G2_15,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_151,G2,Control,C15,Control,Control_Control,root,3,1,top,ro_G2_151,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_152,G2,Drought,D5,Drought,Drought_Drought,root,3,1,top,ro_G2_152,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_157,G2,Control,C8,Drought,Control_Drought,root,3,1,top,ro_G2_157,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_159,G2,Drought,D10,Drought,Drought_Drought,root,3,1,top,ro_G2_159,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_160,G2,Control,C2B,Control,Control_Control,root,3,1,top,ro_G2_160,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_168,G2,Drought,D13,Drought,Drought_Drought,root,3,1,top,ro_G2_168,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_172,G2,Drought,D11,Drought,Drought_Drought,root,3,1,top,ro_G2_172,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_175,G2,Control,C15,Drought,Control_Drought,root,3,1,bottom,ro_G2_175,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_176,G2,Drought,D11,Control,Drought_Control,root,3,1,bottom,ro_G2_176,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_178,G2,Control,C2B,Drought,Control_Drought,root,3,1,bottom,ro_G2_178,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_179,G2,Control,C1B,Control,Control_Control,root,3,1,bottom,ro_G2_179,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_188,G2,Drought,D10,Control,Drought_Control,root,3,1,bottom,ro_G2_188,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_192,G2,Drought,D13,Control,Drought_Control,root,3,1,bottom,ro_G2_192,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_205,G2,Control,C1B,Drought,Control_Drought,root,3,2,bottom,ro_G2_205,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_212,G2,Drought,D5,Control,Drought_Control,root,3,2,bottom,ro_G2_212,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_216,G2,Control,C8,Control,Control_Control,root,3,2,bottom,ro_G2_216,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_24,G2,Control,C11,Drought,Control_Drought,root,1,1,bottom,ro_G2_24,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_29,G2,Control,C10,Control,Control_Control,root,1,1,bottom,ro_G2_29,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_32,G2,Control,C2,Control,Control_Control,root,1,1,bottom,ro_G2_32,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_33,G2,Control,C2,Drought,Control_Drought,root,1,1,bottom,ro_G2_33,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_42,G2,Control,C10,Drought,Control_Drought,root,1,1,bottom,ro_G2_42,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_45,G2,Control,C11,Control,Control_Control,root,1,1,bottom,ro_G2_45,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_46,G2,Drought,D9,Drought,Drought_Drought,root,1,2,top,ro_G2_46,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_53,G2,Drought,D8,Control,Drought_Control,root,1,2,top,ro_G2_53,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_54,G2,Control,C2,Drought,Control_Drought,root,1,2,top,ro_G2_54,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_6,G2,Drought,D8,Drought,Drought_Drought,root,1,1,top,ro_G2_6,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_61,G2,Drought,D9,Control,Drought_Control,root,1,2,top,ro_G2_61,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_62,G2,Drought,D7,Control,Drought_Control,root,1,2,top,ro_G2_62,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_72,G2,Control,C6,Control,Control_Control,root,1,2,bottom,ro_G2_72,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_73,G2,Control,C6,Drought,Control_Drought,root,1,2,bottom,ro_G2_73,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_76,G2,Drought,D14,Drought,Drought_Drought,root,1,2,bottom,ro_G2_76,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_77,G2,Drought,D14,Control,Drought_Control,root,1,2,bottom,ro_G2_77,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_82,G2,Control,C13,Drought,Control_Drought,root,1,2,bottom,ro_G2_82,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_88,G2,Control,C13,Control,Control_Control,root,1,2,bottom,ro_G2_88,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_92,G2,Drought,D6,Drought,Drought_Drought,root,2,1,top,ro_G2_92,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_94,G2,Control,C5,Control,Control_Control,root,2,1,top,ro_G2_94,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+ROOT_G2_98,G2,Drought,D1B,Control,Drought_Control,root,2,1,top,ro_G2_98,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+19S2,Source Soil,,,,,Source Soil,NA,NA,,bu_19S2,NA,Source Soil,Soil,MSU,MSU_Soil
+19S3,Source Soil,,,,,Source Soil,NA,NA,,bu_19S3,NA,Source Soil,Soil,MSU,MSU_Soil
+19S4,Source Soil,,,,,Source Soil,NA,NA,,bu_19S4,NA,Source Soil,Soil,MSU,MSU_Soil
+2019_Soil_1,Source Soil,,,,,Source Soil,NA,NA,,bu_2019_Soil_1,NA,Source Soil,Soil,MSU,MSU_Soil
+2020_Soil_1,Source Soil,,,,,Source Soil,NA,NA,,bu_2020_Soil_1,NA,Source Soil,Soil,MSU,MSU_Soil
+20S2,Source Soil,,,,,Source Soil,NA,NA,,bu_20S2,NA,Source Soil,Soil,MSU,MSU_Soil
+20S3,Source Soil,,,,,Source Soil,NA,NA,,bu_20S3,NA,Source Soil,Soil,MSU,MSU_Soil
+20S4,Source Soil,,,,,Source Soil,NA,NA,,bu_20S4,NA,Source Soil,Soil,MSU,MSU_Soil
+21MS1,Source Soil,,,,,Source Soil,NA,NA,,bu_21MS1,NA,Source Soil,Soil,MSU,MSU_Soil
+21MS2,Source Soil,,,,,Source Soil,NA,NA,,bu_21MS2,NA,Source Soil,Soil,MSU,MSU_Soil
+21MS3,Source Soil,,,,,Source Soil,NA,NA,,bu_21MS3,NA,Source Soil,Soil,MSU,MSU_Soil
+21MS4,Source Soil,,,,,Source Soil,NA,NA,,bu_21MS4,NA,Source Soil,Soil,MSU,MSU_Soil
+21SS1,Source Soil,,,,,Source Soil,NA,NA,,bu_21SS1,NA,Source Soil,Soil,MSU,MSU_Soil
+21SS2,Source Soil,,,,,Source Soil,NA,NA,,bu_21SS2,NA,Source Soil,Soil,MSU,MSU_Soil
+21SS3,Source Soil,,,,,Source Soil,NA,NA,,bu_21SS3,NA,Source Soil,Soil,MSU,MSU_Soil
+21SS4,Source Soil,,,,,Source Soil,NA,NA,,bu_21SS4,NA,Source Soil,Soil,MSU,MSU_Soil
+G1_C10,G1,Control,G0_bulk,,,rhizosphere,NA,2,bottom,rh_G1_C10,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G1_C11,G1,Control,G0_bulk,,,rhizosphere,NA,1,bottom,rh_G1_C11,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G1_C13,G1,Control,G0_bulk,,,rhizosphere,NA,2,bottom,rh_G1_C13,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G1_C2,G1,Control,G0_bulk,,,rhizosphere,NA,1,bottom,rh_G1_C2,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G1_C6,G1,Control,G0_bulk,,,rhizosphere,NA,1,bottom,rh_G1_C6,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G1_D14,G1,Drought,G0_bulk,,,rhizosphere,NA,2,bottom,rh_G1_D14,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G1_D15,G1,Drought,G0_bulk,,,rhizosphere,NA,2,bottom,rh_G1_D15,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G1_D7,G1,Drought,G0_bulk,,,rhizosphere,NA,1,bottom,rh_G1_D7,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G1_D8,G1,Drought,G0_bulk,,,rhizosphere,NA,2,bottom,rh_G1_D8,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G1_D9,G1,Drought,G0_bulk,,,rhizosphere,NA,1,bottom,rh_G1_D9,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_110,G2,Control,C12,Drought,Control_Drought,rhizosphere,2,1,top,rh_G2_110,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_112,G2,Drought,D6,Control,Drought_Control,rhizosphere,2,1,bottom,rh_G2_112,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_12,G2,Drought,D7,Drought,Drought_Drought,rhizosphere,1,1,top,rh_G2_12,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_123,G2,Drought,D1B,Drought,Drought_Drought,rhizosphere,2,1,bottom,rh_G2_123,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_126,G2,Drought,D2B,Drought,Drought_Drought,rhizosphere,2,1,bottom,rh_G2_126,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_129,G2,Control,C4,Control,Control_Control,rhizosphere,2,1,bottom,rh_G2_129,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_139,G2,Drought,D2B,Control,Drought_Control,rhizosphere,2,2,bottom,rh_G2_139,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_146,G2,Control,C12,Control,Control_Control,rhizosphere,2,2,bottom,rh_G2_146,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_147,G2,Control,C4,Drought,Control_Drought,rhizosphere,2,2,bottom,rh_G2_147,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_148,G2,Control,C5,Drought,Control_Drought,rhizosphere,2,2,bottom,rh_G2_148,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_15,G2,Drought,D15,Drought,Drought_Drought,rhizosphere,1,1,top,rh_G2_15,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_151,G2,Control,C15,Control,Control_Control,rhizosphere,3,1,top,rh_G2_151,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_152,G2,Drought,D5,Drought,Drought_Drought,rhizosphere,3,1,top,rh_G2_152,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_157,G2,Control,C8,Drought,Control_Drought,rhizosphere,3,1,top,rh_G2_157,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_159,G2,Drought,D10,Drought,Drought_Drought,rhizosphere,3,1,top,rh_G2_159,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_160,G2,Control,C2B,Control,Control_Control,rhizosphere,3,1,top,rh_G2_160,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_168,G2,Drought,D13,Drought,Drought_Drought,rhizosphere,3,1,top,rh_G2_168,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_172,G2,Drought,D11,Drought,Drought_Drought,rhizosphere,3,1,top,rh_G2_172,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_175,G2,Control,C15,Drought,Control_Drought,rhizosphere,3,1,bottom,rh_G2_175,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_176,G2,Drought,D11,Control,Drought_Control,rhizosphere,3,1,bottom,rh_G2_176,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_178,G2,Control,C2B,Drought,Control_Drought,rhizosphere,3,1,bottom,rh_G2_178,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_179,G2,Control,C1B,Control,Control_Control,rhizosphere,3,1,bottom,rh_G2_179,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_188,G2,Drought,D10,Control,Drought_Control,rhizosphere,3,1,bottom,rh_G2_188,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_192,G2,Drought,D13,Control,Drought_Control,rhizosphere,3,1,bottom,rh_G2_192,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_205,G2,Control,C1B,Drought,Control_Drought,rhizosphere,3,2,bottom,rh_G2_205,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_212,G2,Drought,D5,Control,Drought_Control,rhizosphere,3,2,bottom,rh_G2_212,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_216,G2,Control,C8,Control,Control_Control,rhizosphere,3,2,bottom,rh_G2_216,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_24,G2,Control,C11,Drought,Control_Drought,rhizosphere,1,1,bottom,rh_G2_24,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_29,G2,Control,C10,Control,Control_Control,rhizosphere,1,1,bottom,rh_G2_29,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_3,G2,Drought,D15,Control,Drought_Control,rhizosphere,1,1,top,rh_G2_3,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_32,G2,Control,C2,Control,Control_Control,rhizosphere,1,1,bottom,rh_G2_32,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_33,G2,Control,C2,Drought,Control_Drought,rhizosphere,1,1,bottom,rh_G2_33,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_42,G2,Control,C10,Drought,Control_Drought,rhizosphere,1,1,bottom,rh_G2_42,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_45,G2,Control,C11,Control,Control_Control,rhizosphere,1,1,bottom,rh_G2_45,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_46,G2,Drought,D9,Drought,Drought_Drought,rhizosphere,1,2,top,rh_G2_46,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_53,G2,Drought,D8,Control,Drought_Control,rhizosphere,1,2,top,rh_G2_53,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_54,G2,Control,C2,Drought,Control_Drought,rhizosphere,1,2,top,rh_G2_54,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_6,G2,Drought,D8,Drought,Drought_Drought,rhizosphere,1,1,top,rh_G2_6,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_61,G2,Drought,D9,Control,Drought_Control,rhizosphere,1,2,top,rh_G2_61,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_62,G2,Drought,D7,Control,Drought_Control,rhizosphere,1,2,top,rh_G2_62,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_72,G2,Control,C6,Control,Control_Control,rhizosphere,1,2,bottom,rh_G2_72,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_73,G2,Control,C6,Drought,Control_Drought,rhizosphere,1,2,bottom,rh_G2_73,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_76,G2,Drought,D14,Drought,Drought_Drought,rhizosphere,1,2,bottom,rh_G2_76,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_77,G2,Drought,D14,Control,Drought_Control,rhizosphere,1,2,bottom,rh_G2_77,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_82,G2,Control,C13,Drought,Control_Drought,rhizosphere,1,2,bottom,rh_G2_82,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_88,G2,Control,C13,Control,Control_Control,rhizosphere,1,2,bottom,rh_G2_88,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_92,G2,Drought,D6,Drought,Drought_Drought,rhizosphere,2,1,top,rh_G2_92,NA,Drought,Red_Hawk,MSU,MSU_Red_Hawk
+G2_94,G2,Control,C5,Control,Control_Control,rhizosphere,2,1,top,rh_G2_94,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
+G2_98,G2,Drought,D1B,Control,Drought_Control,rhizosphere,2,1,top,rh_G2_98,NA,Control,Red_Hawk,MSU,MSU_Red_Hawk
